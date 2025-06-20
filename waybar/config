@@ -3,8 +3,8 @@
   "position": "top",
   "modules-left": ["hyprland/workspaces"],
   "modules-center": ["clock"],
-  "modules-right": ["pulseaudio", "network", "battery"],
+  "modules-right": ["pulseaudio"],
   "clock": {
-    "format": "{:%H:%M %p}"
+    "format": "{:%H:%M}"
   }
 }

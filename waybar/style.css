@@ -1,9 +1,24 @@
 * {
     font-family: "JetBrainsMono Nerd Font", monospace;
     font-size: 14px;
+
+    padding: 0;
+    margin: 0;
+    border: none;
+    outline: none;
+    border-radius: 0;
+}
+
+window#waybar {
+    /* Fully transparent */
+    background-color: rgba(0, 0, 0, 0);
 }
 
 #clock {
     color: #ffffff;
+}
+
+.modules-right {
+    color: white;
     padding: 0 10px;
 }
