@@ -1,0 +1,9 @@
+* {
+    font-family: "JetBrainsMono Nerd Font", monospace;
+    font-size: 14px;
+}
+
+#clock {
+    color: #ffffff;
+    padding: 0 10px;
+}
