@@ -6,5 +6,6 @@
   "modules-right": ["pulseaudio"],
   "clock": {
     "format": "{:%H:%M}"
-  }
+  },
+  "reload_style_on_change": true
 }
