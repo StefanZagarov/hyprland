@@ -2,130 +2,133 @@
 
 tmp_dir="/tmp/cliphist"
 
-# Define image patterns once
-readonly IMG_EXTS="jpg|jpeg|png|bmp|gif|webp|tiff|svg"
-readonly FILE_URL_PATTERN="^file://(.+\.($IMG_EXTS))$"
-readonly LOCAL_FILE_PATTERN="^(.+\.($IMG_EXTS))$"
-readonly BINARY_PATTERN="^\[\[.*binary.*data.*(image|$IMG_EXTS)"
+# Comprehensive image extension pattern (case-insensitive)
+readonly IMG_PATTERN='\.(jpg|JPG|jpeg|JPEG|png|PNG|bmp|BMP|gif|GIF|webp|WEBP|tiff|TIFF|tif|TIF|svg|SVG|ico|ICO|avif|AVIF|heic|HEIC|heif|HEIF|jfif|JFIF|psd|PSD|raw|RAW|cr2|CR2|nef|NEF|dng|DNG)$'
 
-# Get file extension from content
-get_extension() {
-    local content="$1"
-    case "$content" in
-        *image/jpeg*|*jpeg*|*jpg*) echo "jpg" ;;
-        *image/png*|*png*) echo "png" ;;
-        *image/gif*|*gif*) echo "gif" ;;
-        *image/bmp*|*bmp*) echo "bmp" ;;
-        *image/webp*|*webp*) echo "webp" ;;
-        *image/tiff*|*tiff*) echo "tiff" ;;
-        *image/svg*|*svg*) echo "svg" ;;
-        *) echo "png" ;;
-    esac
-}
-
-# Optimized copy function
-copy_clipboard_content() {
-    local content="$1"
-    local id="$2"
+# Simple copy function with comprehensive image handling
+copy_with_image_handling() {
+    local id="$1"
+    local content="$2"
     
-    # Strip whitespace
-    content=$(echo -n "$content" | tr -d '\r\n')
-    
-    # Determine content type and handle accordingly
-    if [[ "$content" =~ $BINARY_PATTERN ]]; then
-        # Binary image data from browsers
-        local ext=$(get_extension "$content")
-        local temp_file="$tmp_dir/clipboard_image_$(date +%s).$ext"
+    # Handle browser binary images (comprehensive pattern)
+    if [[ "$content" =~ \[\[.*binary.*data.*(image|jpg|jpeg|png|bmp|gif|webp|tiff|svg|ico|avif|heic) ]]; then
+        local temp_file="$tmp_dir/clipboard_image_$(date +%s).png"
         mkdir -p "$tmp_dir"
-        
-        if echo -n "$id" | cliphist decode > "$temp_file" && [[ -f "$temp_file" ]]; then
+        if echo -n "$id" | cliphist decode > "$temp_file"; then
             echo -n "file://$temp_file" | wl-copy --type "text/uri-list"
         else
             echo -n "$id" | cliphist decode | wl-copy
         fi
         echo "$id" | cliphist delete
-        
-    elif [[ "$content" =~ $FILE_URL_PATTERN ]]; then
-        # File URL - copy as-is
+        return
+    fi
+    
+    # Handle data URLs (data:image/png;base64,...)
+    if [[ "$content" =~ ^data:image/ ]]; then
+        echo -n "$content" | wl-copy
+        echo "$id" | cliphist delete
+        return
+    fi
+    
+    # Handle network URLs (https, http, ftp) with image extensions
+    if [[ "$content" =~ ^(https?|ftp):// ]] && [[ "$content" =~ $IMG_PATTERN ]]; then
+        echo -n "$content" | wl-copy
+        echo "$id" | cliphist delete
+        return
+    fi
+    
+    # Handle file URLs (case-insensitive)
+    if [[ "$content" =~ ^file://.* ]] && [[ "$content" =~ $IMG_PATTERN ]]; then
         echo -n "$content" | wl-copy --type "text/uri-list"
         echo "$id" | cliphist delete
+        return
+    fi
+    
+    # Handle local file paths (relative or absolute, case-insensitive)
+    if [[ "$content" =~ $IMG_PATTERN ]]; then
+        # Check if it's a valid file path
+        local filepath="$content"
+        [[ ! "$filepath" =~ ^/ ]] && filepath="$HOME/$content"  # Make relative paths absolute
         
-    elif [[ "$content" =~ $LOCAL_FILE_PATTERN ]]; then
-        # Local file path
-        local filepath="$HOME/${content}"
         if [[ -f "$filepath" ]]; then
             echo -n "file://$filepath" | wl-copy --type "text/uri-list"
             echo "$id" | cliphist delete
         else
             echo -n "$content" | wl-copy
         fi
-    else
-        # Default: copy as-is
-        echo -n "$content" | wl-copy
+        return
     fi
+    
+    # Default: copy as-is
+    echo -n "$content" | wl-copy
 }
 
-# Process selection if argument provided
+# If argument provided, copy it
 if [[ -n "$1" ]]; then
-    # Extract ID from argument
-    id="${1%%[[:space:]]*}"  # More efficient than regex for simple case
-    [[ "$id" =~ ^[0-9]+$ ]] || id="$1"
-    
-    # Get description for pattern matching
-    description=$(cliphist list | grep "^$id" | cut -f2-)
-    copy_clipboard_content "$description" "$id"
+    id="${1%% *}"
+    content=$(cliphist list | grep "^$id" | cut -f2-)
+    copy_with_image_handling "$id" "$content"
     exit
 fi
 
-# Optimized cleanup: get clipboard list once
+# Generate list with comprehensive icon detection
 mkdir -p "$tmp_dir"
-clipboard_files=$(cliphist list)
 
-# Clean up old preview files (can be regenerated)
+# Cleanup logic to prevent tmp_dir from filling up
+# Clean up old preview files (numbered files like 453.png) - these can be regenerated
 find "$tmp_dir" -name "[0-9]*.png" -type f -delete 2>/dev/null
 
-# Clean up unreferenced clipboard files in one pass
+# Get clipboard list once for efficient cleanup and processing
+clipboard_list=$(cliphist list)
+
+# Clean up clipboard files that are no longer referenced in clipboard history
 while IFS= read -r -d '' file; do
-    grep -q "file://$file" <<< "$clipboard_files" || rm -f "$file"
+    grep -q "file://$file" <<< "$clipboard_list" || rm -f "$file"
 done < <(find "$tmp_dir" -name "clipboard_image_*.png" -type f -print0 2>/dev/null)
 
-# Clean up old files (24+ hours)
+# Clean up very old clipboard files (older than 24 hours)
 find "$tmp_dir" -name "clipboard_image_*.png" -type f -mtime +1 -delete 2>/dev/null
 
-# Optimized awk script with consolidated patterns
-read -r -d '' prog <<'EOF'
-/^[0-9]+\s*<meta http-equiv=/ { next }
-
-# Binary image data
-match($0, /^([0-9]+)\s*\[\[.*binary.*data.*(image\/(jpeg|jpg|png|bmp|gif|webp|tiff|svg)|jpg|jpeg|png|bmp|gif|webp|tiff|svg)/, grp) {
-    # Determine extension
-    ext = "png"  # default
-    if (match(grp[2], /(jpeg|jpg)/)) ext = "jpg"
-    else if (match(grp[2], /png/)) ext = "png"
-    else if (match(grp[2], /gif/)) ext = "gif"
-    else if (match(grp[2], /bmp/)) ext = "bmp"
-    else if (match(grp[2], /webp/)) ext = "webp"
-    else if (match(grp[2], /tiff/)) ext = "tiff"
-    else if (match(grp[2], /svg/)) ext = "svg"
+echo "$clipboard_list" | while IFS=$'\t' read -r id content; do
+    # Skip HTML meta tags
+    [[ "$content" =~ ^'<meta http-equiv=' ]] && continue
     
-    system("echo -n " grp[1] " | cliphist decode > " ENVIRON["tmp_dir"] "/" grp[1] "." ext)
-    print $0 "\000icon\037" ENVIRON["tmp_dir"] "/" grp[1] "." ext
-    next
-}
-
-# File URLs  
-match($0, /^([0-9]+)\s*file:\/\/(.+\.(jpg|jpeg|png|bmp|gif|webp|tiff|svg))$/, grp) {
-    if (system("test -f \"" grp[2] "\"") == 0) {
-        print $0 "\000icon\037" grp[2]
-    } else {
-        print $0 "\000icon\037image-x-generic"
-    }
-    next
-}
-
-# Print all other lines
-1
-EOF
-
-export tmp_dir
-cliphist list | gawk "$prog" 
+    # Binary images: create temp preview (comprehensive pattern)
+    if [[ "$content" =~ \[\[.*binary.*data.*(image|jpg|jpeg|png|bmp|gif|webp|tiff|svg|ico|avif|heic) ]]; then
+        preview="$tmp_dir/${id}.png"
+        [[ ! -f "$preview" ]] && echo -n "$id" | cliphist decode > "$preview"
+        printf '%s\t%s\000icon\037%s\n' "$id" "$content" "$preview"
+        
+    # Data URLs: show with generic image icon
+    elif [[ "$content" =~ ^data:image/ ]]; then
+        printf '%s\t%s\000icon\037image-x-generic\n' "$id" "$content"
+        
+    # Network URLs: show with generic image icon (case-insensitive)
+    elif [[ "$content" =~ ^(https?|ftp):// ]] && [[ "$content" =~ $IMG_PATTERN ]]; then
+        printf '%s\t%s\000icon\037image-x-generic\n' "$id" "$content"
+        
+    # File URLs: use actual file as icon (case-insensitive)
+    elif [[ "$content" =~ ^file://.* ]] && [[ "$content" =~ $IMG_PATTERN ]]; then
+        filepath="${content#file://}"
+        if [[ -f "$filepath" ]]; then
+            printf '%s\t%s\000icon\037%s\n' "$id" "$content" "$filepath"
+        else
+            printf '%s\t%s\000icon\037image-x-generic\n' "$id" "$content"
+        fi
+        
+    # Local file paths: check if valid image file (case-insensitive)
+    elif [[ "$content" =~ $IMG_PATTERN ]]; then
+        filepath="$content"
+        [[ ! "$filepath" =~ ^/ ]] && filepath="$HOME/$content"  # Make relative paths absolute
+        
+        if [[ -f "$filepath" ]]; then
+            printf '%s\t%s\000icon\037%s\n' "$id" "$content" "$filepath"
+        else
+            printf '%s\t%s\000icon\037image-x-generic\n' "$id" "$content"
+        fi
+        
+    # Everything else: no icon
+    else
+        printf '%s\t%s\n' "$id" "$content"
+    fi
+done 
