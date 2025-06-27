@@ -101,8 +101,23 @@ if [[ -n "$1" ]]; then
 fi
 
 # Generate list with icons using awk
-# Don't delete temp directory - let files accumulate for applications to access
+# Smart cleanup: remove old files but keep ones still in use
 mkdir -p "$tmp_dir"
+
+# Clean up old preview files (numbered files like 453.png) - these can be regenerated
+find "$tmp_dir" -name "[0-9]*.png" -type f -delete 2>/dev/null
+
+# Clean up clipboard files that are no longer referenced in clipboard history
+while IFS= read -r -d '' file; do
+    filename=$(basename "$file")
+    # Check if this clipboard file is still referenced in cliphist
+    if ! cliphist list | grep -q "file://$file"; then
+        rm -f "$file"
+    fi
+done < <(find "$tmp_dir" -name "clipboard_image_*.png" -type f -print0 2>/dev/null)
+
+# Also clean up very old clipboard files (older than 24 hours) regardless of references
+find "$tmp_dir" -name "clipboard_image_*.png" -type f -mtime +1 -delete 2>/dev/null
 
 read -r -d '' prog <<'EOF'
 /^[0-9]+\s*<meta http-equiv=/ { next }
