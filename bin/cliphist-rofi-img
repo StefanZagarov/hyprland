@@ -2,127 +2,103 @@
 
 tmp_dir="/tmp/cliphist"
 
-# Copy function that removes old entries and puts selected item at top of clipboard history
+# Define image patterns once
+readonly IMG_EXTS="jpg|jpeg|png|bmp|gif|webp|tiff|svg"
+readonly FILE_URL_PATTERN="^file://(.+\.($IMG_EXTS))$"
+readonly LOCAL_FILE_PATTERN="^(.+\.($IMG_EXTS))$"
+readonly BINARY_PATTERN="^\[\[.*binary.*data.*(image|$IMG_EXTS)"
+
+# Get file extension from content
+get_extension() {
+    local content="$1"
+    case "$content" in
+        *image/jpeg*|*jpeg*|*jpg*) echo "jpg" ;;
+        *image/png*|*png*) echo "png" ;;
+        *image/gif*|*gif*) echo "gif" ;;
+        *image/bmp*|*bmp*) echo "bmp" ;;
+        *image/webp*|*webp*) echo "webp" ;;
+        *image/tiff*|*tiff*) echo "tiff" ;;
+        *image/svg*|*svg*) echo "svg" ;;
+        *) echo "png" ;;
+    esac
+}
+
+# Optimized copy function
 copy_clipboard_content() {
     local content="$1"
     local id="$2"
-    local content_to_copy=""
     
-    # Strip whitespace (the key fix we discovered)
+    # Strip whitespace
     content=$(echo -n "$content" | tr -d '\r\n')
     
-    # Determine what we would copy
-    if [[ "$content" =~ ^file://(.+\.(jpg|jpeg|png|bmp|gif|webp|tiff|svg))$ ]]; then
-        content_to_copy="$content"
-    elif [[ "$content" =~ ^(.+\.(jpg|jpeg|png|bmp|gif|webp|tiff|svg))$ ]]; then
-        local filepath="$HOME/${content}"
-        if [[ -f "$filepath" ]]; then
-            content_to_copy="file://$filepath"
-        else
-            content_to_copy="$content"
-        fi
-    elif [[ "$content" =~ ^\[\[.*binary.*data.*(image|jpg|jpeg|png|bmp|gif|webp|tiff|svg) ]]; then
+    # Determine content type and handle accordingly
+    if [[ "$content" =~ $BINARY_PATTERN ]]; then
         # Binary image data from browsers
-        content_to_copy="$content"
-    else
-        content_to_copy="$content"
-    fi
-
-    # Now copy the content (will appear at top of history)
-    if [[ "$content" =~ ^\[\[.*binary.*data.*(image|jpg|jpeg|png|bmp|gif|webp|tiff|svg) ]]; then
-        # Binary image data from browsers - save to temp file and copy as file URL
-        local ext="png"  # default
-        if [[ "$content" =~ image/jpeg|jpeg|jpg ]]; then
-            ext="jpg"
-        elif [[ "$content" =~ image/png|png ]]; then
-            ext="png"
-        elif [[ "$content" =~ image/gif|gif ]]; then
-            ext="gif"
-        elif [[ "$content" =~ image/bmp|bmp ]]; then
-            ext="bmp"
-        elif [[ "$content" =~ image/webp|webp ]]; then
-            ext="webp"
-        elif [[ "$content" =~ image/tiff|tiff ]]; then
-            ext="tiff"
-        elif [[ "$content" =~ image/svg|svg ]]; then
-            ext="svg"
-        fi
-        
+        local ext=$(get_extension "$content")
         local temp_file="$tmp_dir/clipboard_image_$(date +%s).$ext"
         mkdir -p "$tmp_dir"
-        echo -n "$id" | cliphist decode > "$temp_file"
         
-        if [[ -f "$temp_file" ]]; then
-            # Copy as file URL so applications recognize it as an image file
+        if echo -n "$id" | cliphist decode > "$temp_file" && [[ -f "$temp_file" ]]; then
             echo -n "file://$temp_file" | wl-copy --type "text/uri-list"
         else
-            # Fallback to raw binary if file creation failed
             echo -n "$id" | cliphist decode | wl-copy
         fi
-    elif [[ "$content" =~ ^file://(.+\.(jpg|jpeg|png|bmp|gif|webp|tiff|svg))$ ]]; then
-        # Copy the file URI in the format that file managers and Discord expect
+        echo "$id" | cliphist delete
+        
+    elif [[ "$content" =~ $FILE_URL_PATTERN ]]; then
+        # File URL - copy as-is
         echo -n "$content" | wl-copy --type "text/uri-list"
-    elif [[ "$content" =~ ^(.+\.(jpg|jpeg|png|bmp|gif|webp|tiff|svg))$ ]]; then
+        echo "$id" | cliphist delete
+        
+    elif [[ "$content" =~ $LOCAL_FILE_PATTERN ]]; then
+        # Local file path
         local filepath="$HOME/${content}"
         if [[ -f "$filepath" ]]; then
             echo -n "file://$filepath" | wl-copy --type "text/uri-list"
+            echo "$id" | cliphist delete
         else
             echo -n "$content" | wl-copy
         fi
     else
-        # Default: copy as-is (text or binary)
+        # Default: copy as-is
         echo -n "$content" | wl-copy
-    fi
-    
-    # Handle duplicate removal based on content type
-    if [[ "$content" =~ ^\[\[.*binary.*data.*(image|jpg|jpeg|png|bmp|gif|webp|tiff|svg) ]]; then
-        # Always delete the original binary entry since we converted it to a file URL
-        echo "$id" | cliphist delete
-    elif [[ "$content" =~ ^file://(.+\.(jpg|jpeg|png|bmp|gif|webp|tiff|svg))$ ]] || 
-         [[ "$content" =~ ^(.+\.(jpg|jpeg|png|bmp|gif|webp|tiff|svg))$ && -f "$HOME/${content}" ]]; then
-        # For file URLs (including converted browser images), always delete the OLD entry we selected
-        # The new entry was just created at the top by wl-copy
-        echo "$id" | cliphist delete
     fi
 }
 
-# If argument provided, decode and copy
+# Process selection if argument provided
 if [[ -n "$1" ]]; then
-    # Extract ID if it's a full line, otherwise use as-is
-    if [[ "$1" =~ ^([0-9]+) ]]; then
-        id="${BASH_REMATCH[1]}"
-    else
-        id="$1"
-    fi
-    # Get the description from cliphist list for pattern matching
+    # Extract ID from argument
+    id="${1%%[[:space:]]*}"  # More efficient than regex for simple case
+    [[ "$id" =~ ^[0-9]+$ ]] || id="$1"
+    
+    # Get description for pattern matching
     description=$(cliphist list | grep "^$id" | cut -f2-)
     copy_clipboard_content "$description" "$id"
     exit
 fi
 
-# Generate list with icons using awk
-# Smart cleanup: remove old files but keep ones still in use
+# Optimized cleanup: get clipboard list once
 mkdir -p "$tmp_dir"
+clipboard_files=$(cliphist list)
 
-# Clean up old preview files (numbered files like 453.png) - these can be regenerated
+# Clean up old preview files (can be regenerated)
 find "$tmp_dir" -name "[0-9]*.png" -type f -delete 2>/dev/null
 
-# Clean up clipboard files that are no longer referenced in clipboard history
+# Clean up unreferenced clipboard files in one pass
 while IFS= read -r -d '' file; do
-    filename=$(basename "$file")
-    # Check if this clipboard file is still referenced in cliphist
-    if ! cliphist list | grep -q "file://$file"; then
-        rm -f "$file"
-    fi
+    grep -q "file://$file" <<< "$clipboard_files" || rm -f "$file"
 done < <(find "$tmp_dir" -name "clipboard_image_*.png" -type f -print0 2>/dev/null)
 
-# Also clean up very old clipboard files (older than 24 hours) regardless of references
+# Clean up old files (24+ hours)
 find "$tmp_dir" -name "clipboard_image_*.png" -type f -mtime +1 -delete 2>/dev/null
 
+# Optimized awk script with consolidated patterns
 read -r -d '' prog <<'EOF'
 /^[0-9]+\s*<meta http-equiv=/ { next }
-match($0, /^([0-9]+)\s*\[\[.*binary.*data.*(image\/jpeg|image\/jpg|image\/png|image\/bmp|image\/gif|image\/webp|image\/tiff|image\/svg|jpg|jpeg|png|bmp|gif|webp|tiff|svg)/, grp) {
-    # Extract file extension from mime type or direct extension
+
+# Binary image data
+match($0, /^([0-9]+)\s*\[\[.*binary.*data.*(image\/(jpeg|jpg|png|bmp|gif|webp|tiff|svg)|jpg|jpeg|png|bmp|gif|webp|tiff|svg)/, grp) {
+    # Determine extension
     ext = "png"  # default
     if (match(grp[2], /(jpeg|jpg)/)) ext = "jpg"
     else if (match(grp[2], /png/)) ext = "png"
@@ -133,17 +109,21 @@ match($0, /^([0-9]+)\s*\[\[.*binary.*data.*(image\/jpeg|image\/jpg|image\/png|im
     else if (match(grp[2], /svg/)) ext = "svg"
     
     system("echo -n " grp[1] " | cliphist decode > " ENVIRON["tmp_dir"] "/" grp[1] "." ext)
-    print $0 "\0icon\x1f" ENVIRON["tmp_dir"] "/" grp[1] "." ext
+    print $0 "\000icon\037" ENVIRON["tmp_dir"] "/" grp[1] "." ext
     next
 }
+
+# File URLs  
 match($0, /^([0-9]+)\s*file:\/\/(.+\.(jpg|jpeg|png|bmp|gif|webp|tiff|svg))$/, grp) {
     if (system("test -f \"" grp[2] "\"") == 0) {
-        print $0 "\0icon\x1f" grp[2]
+        print $0 "\000icon\037" grp[2]
     } else {
-        print $0 "\0icon\x1fimage-x-generic"
+        print $0 "\000icon\037image-x-generic"
     }
     next
 }
+
+# Print all other lines
 1
 EOF
 
