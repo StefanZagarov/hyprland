@@ -1,0 +1,2 @@
+#!/bin/bash
+grim -g "$(slurp)" /home/war/Pictures/Screenshots/screenshot-$(date +%F-%T).png

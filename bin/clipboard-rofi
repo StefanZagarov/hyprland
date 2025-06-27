@@ -1,0 +1,12 @@
+# Get the selection from rofi
+selected=$(~/.local/bin/cliphist-rofi-img | rofi -dmenu -show-icons -p "Clipboard" -format "s")
+
+# If something was selected, process it
+if [[ -n "$selected" ]]; then
+    # Extract just the ID from the beginning of the line (before any tab or space)
+    if [[ "$selected" =~ ^([0-9]+) ]]; then
+        id="${BASH_REMATCH[1]}"
+        # Pass just the ID to the script for processing
+        ~/.local/bin/cliphist-rofi-img "$id"
+    fi
+fi

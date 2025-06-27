@@ -1,0 +1,9 @@
+#!/bin/bash
+export QT_STYLE_OVERRIDE=kvantum
+export QT_QPA_PLATFORMTHEME=""
+export XDG_CURRENT_DESKTOP=KDE
+export KDEHOME="$HOME/.config/hypr-kde"
+export ICON_THEME=Papirus-Dark
+
+exec dolphin "$@"
+

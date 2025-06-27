@@ -1,0 +1,68 @@
+#!/usr/bin/env bash
+
+tmp_dir="/tmp/cliphist"
+rm -rf "$tmp_dir"
+
+# Copy function that preserves original clipboard metadata including filenames
+copy_clipboard_content() {
+    local content="$1"
+    
+    # Strip whitespace (the key fix we discovered)
+    content=$(echo -n "$content" | tr -d '\r\n')
+    
+    # For file:// URIs, copy the URI as text/uri-list to preserve filename metadata
+    if [[ "$content" =~ ^file://(.+\.(jpg|jpeg|png|bmp|gif|webp|tiff|svg))$ ]]; then
+        # Copy the file URI in the format that file managers and Discord expect
+        echo -n "$content" | wl-copy --type "text/uri-list"
+        return
+    fi
+    
+    # For relative paths, convert to file:// URI and copy as text/uri-list
+    if [[ "$content" =~ ^(.+\.(jpg|jpeg|png|bmp|gif|webp|tiff|svg))$ ]]; then
+        local filepath="$HOME/${content}"
+        if [[ -f "$filepath" ]]; then
+            echo -n "file://$filepath" | wl-copy --type "text/uri-list"
+            return
+        fi
+    fi
+    
+    # Default: copy as-is (text or binary)
+    echo -n "$content" | wl-copy
+}
+
+# If argument provided, decode and copy
+if [[ -n "$1" ]]; then
+    # Extract ID if it's a full line, otherwise use as-is
+    if [[ "$1" =~ ^([0-9]+) ]]; then
+        id="${BASH_REMATCH[1]}"
+    else
+        id="$1"
+    fi
+    content=$(echo -n "$id" | cliphist decode)
+    copy_clipboard_content "$content"
+    exit
+fi
+
+# Generate list with icons using awk
+mkdir -p "$tmp_dir"
+
+read -r -d '' prog <<'EOF'
+/^[0-9]+\s*<meta http-equiv=/ { next }
+match($0, /^([0-9]+)\s*(\[\[\s*)?binary.*(jpg|jpeg|png|bmp|gif|webp|tiff|svg)/, grp) {
+    system("echo -n " grp[1] " | cliphist decode > " ENVIRON["tmp_dir"] "/" grp[1] "." grp[3])
+    print $0 "\0icon\x1f" ENVIRON["tmp_dir"] "/" grp[1] "." grp[3]
+    next
+}
+match($0, /^([0-9]+)\s*file:\/\/(.+\.(jpg|jpeg|png|bmp|gif|webp|tiff|svg))$/, grp) {
+    if (system("test -f \"" grp[2] "\"") == 0) {
+        print $0 "\0icon\x1f" grp[2]
+    } else {
+        print $0 "\0icon\x1fimage-x-generic"
+    }
+    next
+}
+1
+EOF
+
+export tmp_dir
+cliphist list | gawk "$prog" 
