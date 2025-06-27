@@ -3,31 +3,54 @@
 tmp_dir="/tmp/cliphist"
 rm -rf "$tmp_dir"
 
-# Copy function that preserves original clipboard metadata including filenames
+# Copy function that removes old entries and puts selected item at top of clipboard history
 copy_clipboard_content() {
     local content="$1"
+    local content_to_copy=""
     
     # Strip whitespace (the key fix we discovered)
     content=$(echo -n "$content" | tr -d '\r\n')
     
-    # For file:// URIs, copy the URI as text/uri-list to preserve filename metadata
+    # Determine what we would copy
     if [[ "$content" =~ ^file://(.+\.(jpg|jpeg|png|bmp|gif|webp|tiff|svg))$ ]]; then
-        # Copy the file URI in the format that file managers and Discord expect
-        echo -n "$content" | wl-copy --type "text/uri-list"
-        return
-    fi
-    
-    # For relative paths, convert to file:// URI and copy as text/uri-list
-    if [[ "$content" =~ ^(.+\.(jpg|jpeg|png|bmp|gif|webp|tiff|svg))$ ]]; then
+        content_to_copy="$content"
+    elif [[ "$content" =~ ^(.+\.(jpg|jpeg|png|bmp|gif|webp|tiff|svg))$ ]]; then
         local filepath="$HOME/${content}"
         if [[ -f "$filepath" ]]; then
-            echo -n "file://$filepath" | wl-copy --type "text/uri-list"
-            return
+            content_to_copy="file://$filepath"
+        else
+            content_to_copy="$content"
+        fi
+    else
+        content_to_copy="$content"
+    fi
+    
+    # Remove any existing duplicate entries first
+    # Search for lines that end with our content (after the ID and tab)
+    local existing_entry=$(cliphist list | grep -F "$content_to_copy")
+    if [[ -n "$existing_entry" ]]; then
+        # Extract the ID and delete the old entry
+        if [[ "$existing_entry" =~ ^([0-9]+) ]]; then
+            local old_id="${BASH_REMATCH[1]}"
+            echo "$old_id" | cliphist delete
         fi
     fi
     
-    # Default: copy as-is (text or binary)
-    echo -n "$content" | wl-copy
+    # Now copy the content (will appear at top of history)
+    if [[ "$content" =~ ^file://(.+\.(jpg|jpeg|png|bmp|gif|webp|tiff|svg))$ ]]; then
+        # Copy the file URI in the format that file managers and Discord expect
+        echo -n "$content" | wl-copy --type "text/uri-list"
+    elif [[ "$content" =~ ^(.+\.(jpg|jpeg|png|bmp|gif|webp|tiff|svg))$ ]]; then
+        local filepath="$HOME/${content}"
+        if [[ -f "$filepath" ]]; then
+            echo -n "file://$filepath" | wl-copy --type "text/uri-list"
+        else
+            echo -n "$content" | wl-copy
+        fi
+    else
+        # Default: copy as-is (text or binary)
+        echo -n "$content" | wl-copy
+    fi
 }
 
 # If argument provided, decode and copy
