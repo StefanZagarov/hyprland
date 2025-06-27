@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
 tmp_dir="/tmp/cliphist"
-rm -rf "$tmp_dir"
 
 # Copy function that removes old entries and puts selected item at top of clipboard history
 copy_clipboard_content() {
@@ -27,20 +26,6 @@ copy_clipboard_content() {
         content_to_copy="$content"
     else
         content_to_copy="$content"
-    fi
-
-    # Remove duplicates only for file-based images (not browser binary data)
-    # This allows multiple copies of browser images but prevents file duplicates
-    if [[ "$content" =~ ^file://(.+\.(jpg|jpeg|png|bmp|gif|webp|tiff|svg))$ ]] || 
-       [[ "$content" =~ ^(.+\.(jpg|jpeg|png|bmp|gif|webp|tiff|svg))$ && -f "$HOME/${content}" ]]; then
-        local existing_entry=$(cliphist list | grep -F "$content_to_copy")
-        if [[ -n "$existing_entry" ]]; then
-            # Extract the ID and delete the old entry
-            if [[ "$existing_entry" =~ ^([0-9]+) ]]; then
-                local old_id="${BASH_REMATCH[1]}"
-                echo "$old_id" | cliphist delete
-            fi
-        fi
     fi
 
     # Now copy the content (will appear at top of history)
@@ -88,6 +73,17 @@ copy_clipboard_content() {
         # Default: copy as-is (text or binary)
         echo -n "$content" | wl-copy
     fi
+    
+    # Handle duplicate removal based on content type
+    if [[ "$content" =~ ^\[\[.*binary.*data.*(image|jpg|jpeg|png|bmp|gif|webp|tiff|svg) ]]; then
+        # Always delete the original binary entry since we converted it to a file URL
+        echo "$id" | cliphist delete
+    elif [[ "$content" =~ ^file://(.+\.(jpg|jpeg|png|bmp|gif|webp|tiff|svg))$ ]] || 
+         [[ "$content" =~ ^(.+\.(jpg|jpeg|png|bmp|gif|webp|tiff|svg))$ && -f "$HOME/${content}" ]]; then
+        # For file URLs (including converted browser images), always delete the OLD entry we selected
+        # The new entry was just created at the top by wl-copy
+        echo "$id" | cliphist delete
+    fi
 }
 
 # If argument provided, decode and copy
@@ -105,6 +101,7 @@ if [[ -n "$1" ]]; then
 fi
 
 # Generate list with icons using awk
+# Don't delete temp directory - let files accumulate for applications to access
 mkdir -p "$tmp_dir"
 
 read -r -d '' prog <<'EOF'
