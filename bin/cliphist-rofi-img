@@ -6,6 +6,7 @@ rm -rf "$tmp_dir"
 # Copy function that removes old entries and puts selected item at top of clipboard history
 copy_clipboard_content() {
     local content="$1"
+    local id="$2"
     local content_to_copy=""
     
     # Strip whitespace (the key fix we discovered)
@@ -21,23 +22,59 @@ copy_clipboard_content() {
         else
             content_to_copy="$content"
         fi
+    elif [[ "$content" =~ ^\[\[.*binary.*data.*(image|jpg|jpeg|png|bmp|gif|webp|tiff|svg) ]]; then
+        # Binary image data from browsers
+        content_to_copy="$content"
     else
         content_to_copy="$content"
     fi
-    
-    # Remove any existing duplicate entries first
-    # Search for lines that end with our content (after the ID and tab)
-    local existing_entry=$(cliphist list | grep -F "$content_to_copy")
-    if [[ -n "$existing_entry" ]]; then
-        # Extract the ID and delete the old entry
-        if [[ "$existing_entry" =~ ^([0-9]+) ]]; then
-            local old_id="${BASH_REMATCH[1]}"
-            echo "$old_id" | cliphist delete
+
+    # Remove duplicates only for file-based images (not browser binary data)
+    # This allows multiple copies of browser images but prevents file duplicates
+    if [[ "$content" =~ ^file://(.+\.(jpg|jpeg|png|bmp|gif|webp|tiff|svg))$ ]] || 
+       [[ "$content" =~ ^(.+\.(jpg|jpeg|png|bmp|gif|webp|tiff|svg))$ && -f "$HOME/${content}" ]]; then
+        local existing_entry=$(cliphist list | grep -F "$content_to_copy")
+        if [[ -n "$existing_entry" ]]; then
+            # Extract the ID and delete the old entry
+            if [[ "$existing_entry" =~ ^([0-9]+) ]]; then
+                local old_id="${BASH_REMATCH[1]}"
+                echo "$old_id" | cliphist delete
+            fi
         fi
     fi
-    
+
     # Now copy the content (will appear at top of history)
-    if [[ "$content" =~ ^file://(.+\.(jpg|jpeg|png|bmp|gif|webp|tiff|svg))$ ]]; then
+    if [[ "$content" =~ ^\[\[.*binary.*data.*(image|jpg|jpeg|png|bmp|gif|webp|tiff|svg) ]]; then
+        # Binary image data from browsers - save to temp file and copy as file URL
+        local ext="png"  # default
+        if [[ "$content" =~ image/jpeg|jpeg|jpg ]]; then
+            ext="jpg"
+        elif [[ "$content" =~ image/png|png ]]; then
+            ext="png"
+        elif [[ "$content" =~ image/gif|gif ]]; then
+            ext="gif"
+        elif [[ "$content" =~ image/bmp|bmp ]]; then
+            ext="bmp"
+        elif [[ "$content" =~ image/webp|webp ]]; then
+            ext="webp"
+        elif [[ "$content" =~ image/tiff|tiff ]]; then
+            ext="tiff"
+        elif [[ "$content" =~ image/svg|svg ]]; then
+            ext="svg"
+        fi
+        
+        local temp_file="$tmp_dir/clipboard_image_$(date +%s).$ext"
+        mkdir -p "$tmp_dir"
+        echo -n "$id" | cliphist decode > "$temp_file"
+        
+        if [[ -f "$temp_file" ]]; then
+            # Copy as file URL so applications recognize it as an image file
+            echo -n "file://$temp_file" | wl-copy --type "text/uri-list"
+        else
+            # Fallback to raw binary if file creation failed
+            echo -n "$id" | cliphist decode | wl-copy
+        fi
+    elif [[ "$content" =~ ^file://(.+\.(jpg|jpeg|png|bmp|gif|webp|tiff|svg))$ ]]; then
         # Copy the file URI in the format that file managers and Discord expect
         echo -n "$content" | wl-copy --type "text/uri-list"
     elif [[ "$content" =~ ^(.+\.(jpg|jpeg|png|bmp|gif|webp|tiff|svg))$ ]]; then
@@ -61,8 +98,9 @@ if [[ -n "$1" ]]; then
     else
         id="$1"
     fi
-    content=$(echo -n "$id" | cliphist decode)
-    copy_clipboard_content "$content"
+    # Get the description from cliphist list for pattern matching
+    description=$(cliphist list | grep "^$id" | cut -f2-)
+    copy_clipboard_content "$description" "$id"
     exit
 fi
 
@@ -71,9 +109,19 @@ mkdir -p "$tmp_dir"
 
 read -r -d '' prog <<'EOF'
 /^[0-9]+\s*<meta http-equiv=/ { next }
-match($0, /^([0-9]+)\s*(\[\[\s*)?binary.*(jpg|jpeg|png|bmp|gif|webp|tiff|svg)/, grp) {
-    system("echo -n " grp[1] " | cliphist decode > " ENVIRON["tmp_dir"] "/" grp[1] "." grp[3])
-    print $0 "\0icon\x1f" ENVIRON["tmp_dir"] "/" grp[1] "." grp[3]
+match($0, /^([0-9]+)\s*\[\[.*binary.*data.*(image\/jpeg|image\/jpg|image\/png|image\/bmp|image\/gif|image\/webp|image\/tiff|image\/svg|jpg|jpeg|png|bmp|gif|webp|tiff|svg)/, grp) {
+    # Extract file extension from mime type or direct extension
+    ext = "png"  # default
+    if (match(grp[2], /(jpeg|jpg)/)) ext = "jpg"
+    else if (match(grp[2], /png/)) ext = "png"
+    else if (match(grp[2], /gif/)) ext = "gif"
+    else if (match(grp[2], /bmp/)) ext = "bmp"
+    else if (match(grp[2], /webp/)) ext = "webp"
+    else if (match(grp[2], /tiff/)) ext = "tiff"
+    else if (match(grp[2], /svg/)) ext = "svg"
+    
+    system("echo -n " grp[1] " | cliphist decode > " ENVIRON["tmp_dir"] "/" grp[1] "." ext)
+    print $0 "\0icon\x1f" ENVIRON["tmp_dir"] "/" grp[1] "." ext
     next
 }
 match($0, /^([0-9]+)\s*file:\/\/(.+\.(jpg|jpeg|png|bmp|gif|webp|tiff|svg))$/, grp) {
