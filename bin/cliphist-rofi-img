@@ -5,8 +5,30 @@ tmp_dir="/tmp/cliphist"
 # Comprehensive image extension pattern (case-insensitive)
 readonly IMG_PATTERN='\.(jpg|JPG|jpeg|JPEG|png|PNG|bmp|BMP|gif|GIF|webp|WEBP|tiff|TIFF|tif|TIF|svg|SVG|ico|ICO|avif|AVIF|heic|HEIC|heif|HEIF|jfif|JFIF|psd|PSD|raw|RAW|cr2|CR2|nef|NEF|dng|DNG)$'
 
-# Simple copy function with comprehensive image handling
-copy_with_image_handling() {
+# Check if content is an image
+is_image() {
+    local content="$1"
+    
+    # Binary images
+    [[ "$content" =~ \[\[.*binary.*data.*(image|jpg|jpeg|png|bmp|gif|webp|tiff|svg|ico|avif|heic) ]] && return 0
+    
+    # Data URLs
+    [[ "$content" =~ ^data:image/ ]] && return 0
+    
+    # Network URLs with image extensions
+    [[ "$content" =~ ^(https?|ftp):// ]] && [[ "$content" =~ $IMG_PATTERN ]] && return 0
+    
+    # File URLs with image extensions
+    [[ "$content" =~ ^file://.* ]] && [[ "$content" =~ $IMG_PATTERN ]] && return 0
+    
+    # Local file paths with image extensions
+    [[ "$content" =~ $IMG_PATTERN ]] && return 0
+    
+    return 1
+}
+
+# Image copy function
+copy_image() {
     local id="$1"
     local content="$2"
     
@@ -58,25 +80,29 @@ copy_with_image_handling() {
         fi
         return
     fi
-    
-    # Default: copy as-is
-    echo -n "$content" | wl-copy
 }
 
-# If argument provided, copy it
+# If argument provided, copy it (only if it's an image)
 if [[ -n "$1" ]]; then
     id="${1%% *}"
     content=$(cliphist list | grep "^$id" | cut -f2-)
-    copy_with_image_handling "$id" "$content"
+    
+    # Only process if it's an image
+    if is_image "$content"; then
+        copy_image "$id" "$content"
+    fi
     exit
 fi
 
-# Generate list with comprehensive icon detection
+# Generate list with only image entries
 mkdir -p "$tmp_dir"
 
-# Cleanup logic to prevent tmp_dir from filling up
+# Enhanced cleanup logic to prevent tmp_dir from filling up
 # Clean up old preview files (numbered files like 453.png) - these can be regenerated
 find "$tmp_dir" -name "[0-9]*.png" -type f -delete 2>/dev/null
+
+# Clean up old rofi temporary files (from clipboard-rofi script)
+find "$tmp_dir" -name "rofi_*" -type f -mtime +0 -delete 2>/dev/null
 
 # Get clipboard list once for efficient cleanup and processing
 clipboard_list=$(cliphist list)
@@ -92,6 +118,11 @@ find "$tmp_dir" -name "clipboard_image_*.png" -type f -mtime +1 -delete 2>/dev/n
 echo "$clipboard_list" | while IFS=$'\t' read -r id content; do
     # Skip HTML meta tags
     [[ "$content" =~ ^'<meta http-equiv=' ]] && continue
+    
+    # Only process if it's an image
+    if ! is_image "$content"; then
+        continue
+    fi
     
     # Binary images: create temp preview (comprehensive pattern)
     if [[ "$content" =~ \[\[.*binary.*data.*(image|jpg|jpeg|png|bmp|gif|webp|tiff|svg|ico|avif|heic) ]]; then
@@ -126,9 +157,5 @@ echo "$clipboard_list" | while IFS=$'\t' read -r id content; do
         else
             printf '%s\t%s\000icon\037image-x-generic\n' "$id" "$content"
         fi
-        
-    # Everything else: no icon
-    else
-        printf '%s\t%s\n' "$id" "$content"
     fi
 done 
