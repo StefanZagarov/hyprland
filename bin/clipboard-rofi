@@ -1,12 +1,65 @@
-# Get the selection from rofi
-selected=$(~/.local/bin/cliphist-rofi-img | rofi -dmenu -show-icons -p "Clipboard" -format "s")
+#!/usr/bin/env bash
 
-# If something was selected, process it
-if [[ -n "$selected" ]]; then
-    # Extract just the ID from the beginning of the line (before any tab or space)
-    if [[ "$selected" =~ ^([0-9]+) ]]; then
+# Check if content is an image (same logic as cliphist-rofi-img)
+is_image() {
+    local content="$1"
+    [[ "$content" =~ \[\[.*binary.*data.*(image|jpg|jpeg|png|bmp|gif|webp|tiff|svg|ico|avif|heic) ]] && return 0
+    [[ "$content" =~ ^data:image/ ]] && return 0
+    [[ "$content" =~ ^(https?|ftp):// ]] && [[ "$content" =~ \.(jpg|JPG|jpeg|JPEG|png|PNG|bmp|BMP|gif|GIF|webp|WEBP|tiff|TIFF|tif|TIF|svg|SVG|ico|ICO|avif|AVIF|heic|HEIC|heif|HEIF|jfif|JFIF|psd|PSD|raw|RAW|cr2|CR2|nef|NEF|dng|DNG)$ ]] && return 0
+    [[ "$content" =~ ^file://.* ]] && [[ "$content" =~ \.(jpg|JPG|jpeg|JPEG|png|PNG|bmp|BMP|gif|GIF|webp|WEBP|tiff|TIFF|tif|TIF|svg|SVG|ico|ICO|avif|AVIF|heic|HEIC|heif|HEIF|jfif|JFIF|psd|PSD|raw|RAW|cr2|CR2|nef|NEF|dng|DNG)$ ]] && return 0
+    [[ "$content" =~ \.(jpg|JPG|jpeg|JPEG|png|PNG|bmp|BMP|gif|GIF|webp|WEBP|tiff|TIFF|tif|TIF|svg|SVG|ico|ICO|avif|AVIF|heic|HEIC|heif|HEIF|jfif|JFIF|psd|PSD|raw|RAW|cr2|CR2|nef|NEF|dng|DNG)$ ]] && return 0
+    return 1
+}
+
+# Use same directory as cliphist-rofi-img for organization
+tmp_dir="/tmp/cliphist"
+mkdir -p "$tmp_dir"
+
+# Create temporary files in the cliphist directory
+tmp_images="$tmp_dir/rofi_images_$$"
+tmp_text="$tmp_dir/rofi_text_$$"
+tmp_combined="$tmp_dir/rofi_combined_$$"
+
+# Clean up temporary files on exit
+trap 'rm -f "$tmp_images" "$tmp_text" "$tmp_combined"' EXIT
+
+# Get image entries and save to temp file (preserves rofi formatting)
+~/.local/bin/cliphist-rofi-img > "$tmp_images"
+
+# Get text entries and save to temp file
+cliphist list | while IFS=$'\t' read -r id content; do
+    # Skip if this is an image (already handled by image script)
+    if ! is_image "$content"; then
+        printf '%s\t%s\000icon\037text-x-generic\n' "$id" "$content"
+    fi
+done > "$tmp_text"
+
+# Combine files (images first)
+if [[ -s "$tmp_images" ]]; then
+    cat "$tmp_images" > "$tmp_combined"
+fi
+if [[ -s "$tmp_text" ]]; then
+    cat "$tmp_text" >> "$tmp_combined"
+fi
+
+# Exit if no entries
+[[ ! -s "$tmp_combined" ]] && exit 0
+
+# Show in rofi and get index
+selected_index=$(cat "$tmp_combined" | rofi -dmenu -show-icons -p "Clipboard" -format "i")
+
+# Process selection
+if [[ -n "$selected_index" ]]; then
+    selected_line=$(sed -n "$((selected_index + 1))p" "$tmp_combined")
+    if [[ "$selected_line" =~ ^([0-9]+) ]]; then
         id="${BASH_REMATCH[1]}"
-        # Pass just the ID to the script for processing
-        ~/.local/bin/cliphist-rofi-img "$id"
+        content=$(cliphist list | grep "^$id" | cut -f2-)
+        
+        # Route to appropriate handler based on content type
+        if is_image "$content"; then
+            ~/.local/bin/cliphist-rofi-img "$id"
+        else
+            echo -n "$id" | cliphist decode | wl-copy
+        fi
     fi
 fi
