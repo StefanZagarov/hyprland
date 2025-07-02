@@ -57,55 +57,131 @@ window#waybar {
 }
 
 #custom-cpu-icon {
-    background-color: #ff0000;
-    font-size: 40px;
+    background-color: #A886E9;
+    border: 2px solid #6311fc;
+    border-right: none;
+    border-radius: 5rem 0 0 5rem;
+    padding: 0 0.2rem 0 0.5rem;
+    font-size: 20px;
+    margin-right: 0;
 }
 
 #cpu {
-    border: 2px solid #6311fc;
-    border-radius: 5rem;
-    padding: 0 0.5rem;
     background-color: #A886E9;
+    border: 2px solid #6311fc;
+    border-left: none;
+    border-radius: 0 5rem 5rem 0;
+    padding: 0 0.5rem 0 0.2rem;
+}
+
+#custom-temperature-icon {
+    background-color: #d37171;
+    border: 2px solid #bb0606;
+    border-right: none;
+    border-radius: 5rem 0 0 5rem;
+    padding: 0 0.2rem 0 0.5rem;
+    font-size: 20px;
+    margin-right: 0;
 }
 
 #temperature {
-    border: 2px solid #bb0606;
-    border-radius: 5rem;
-    padding: 0 0.5rem;
     background-color: #d37171;
+    border: 2px solid #bb0606;
+    border-left: none;
+    border-radius: 0 5rem 5rem 0;
+    padding: 0 0.5rem 0 0.2rem;
 }
 
-#custom-cpu-fan {
-    border: 2px solid rgb(2, 13, 170);
-    border-radius: 5rem;
-    padding: 0 0.5rem;
+#custom-cpu-fan-icon {
     background-color: #618fe6;
+    border: 2px solid rgb(2, 13, 170);
+    border-right: none;
+    border-radius: 5rem 0 0 5rem;
+    padding: 0 0.2rem 0 0.5rem;
+    font-size: 20px;
+    margin-right: 0;
     color: #001629;
 }
 
+#custom-cpu-fan {
+    background-color: #618fe6;
+    border: 2px solid rgb(2, 13, 170);
+    border-left: none;
+    border-radius: 0 5rem 5rem 0;
+    padding: 0 0.5rem 0 0.2rem;
+    color: #001629;
+}
+
+#custom-gpu-usage-icon {
+    background-color: #ffb366;
+    border: 2px solid #e67300;
+    border-right: none;
+    border-radius: 5rem 0 0 5rem;
+    padding: 0 0.2rem 0 0.5rem;
+    font-size: 20px;
+    margin-right: 0;
+}
+
 #custom-gpu-usage {
-    border: 2px solid rgb(0, 0, 0);
-    border-radius: 5rem;
-    padding: 0 0.5rem;
+    background-color: #ffb366;
+    border: 2px solid #e67300;
+    border-left: none;
+    border-radius: 0 5rem 5rem 0;
+    padding: 0 0.5rem 0 0.2rem;
+}
+
+#custom-gpu-temp-icon {
+    background-color: #f0d866;
+    border: 2px solid #d4af00;
+    border-right: none;
+    border-radius: 5rem 0 0 5rem;
+    padding: 0 0.2rem 0 0.5rem;
+    font-size: 20px;
+    margin-right: 0;
 }
 
 #custom-gpu-temp {
-    border: 2px solid rgb(0, 0, 0);
-    border-radius: 5rem;
-    padding: 0 0.5rem;
+    background-color: #f0d866;
+    border: 2px solid #d4af00;
+    border-left: none;
+    border-radius: 0 5rem 5rem 0;
+    padding: 0 0.5rem 0 0.2rem;
 }
 
-#memory {
-    border: 2px solid #14c523;
-    border-radius: 5rem;
-    padding: 0 0.5rem;
-    background-color: #4db456;
+#custom-vram-icon {
+    background-color: #67d3f0;
+    border: 2px solid #0891b2;
+    border-right: none;
+    border-radius: 5rem 0 0 5rem;
+    padding: 0 0.2rem 0 0.5rem;
+    font-size: 20px;
+    margin-right: 0;
+}
+
+#custom-vram {
+    background-color: #67d3f0;
+    border: 2px solid #0891b2;
+    border-left: none;
+    border-radius: 0 5rem 5rem 0;
+    padding: 0 0.5rem 0 0.2rem;
+}
+
+#custom-volume-icon {
+    background-color: #e879a6;
+    border: 2px solid #c21e56;
+    border-right: none;
+    border-radius: 5rem 0 0 5rem;
+    padding: 0 0.2rem 0 0.5rem;
+    font-size: 20px;
+    margin-right: 0;
 }
 
 #pulseaudio {
-    border: 2px solid rgb(0, 0, 0);
-    border-radius: 5rem;
-    padding: 0 0.5rem;
+    background-color: #e879a6;
+    border: 2px solid #c21e56;
+    border-left: none;
+    border-radius: 0 5rem 5rem 0;
+    padding: 0 0.5rem 0 0.2rem;
 }
 
 
@@ -135,4 +211,22 @@ window#waybar {
     background-color: #363636;
     border-radius: 5rem;
     padding: 0 0.5rem;
+}
+
+#custom-memory-icon {
+    background-color: #4db456;
+    border: 2px solid #14c523;
+    border-right: none;
+    border-radius: 5rem 0 0 5rem;
+    padding: 0 0.2rem 0 0.5rem;
+    font-size: 20px;
+    margin-right: 0;
+}
+
+#memory {
+    background-color: #4db456;
+    border: 2px solid #14c523;
+    border-left: none;
+    border-radius: 0 5rem 5rem 0;
+    padding: 0 0.5rem 0 0.2rem;
 }

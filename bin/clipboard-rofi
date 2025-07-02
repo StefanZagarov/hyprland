@@ -57,7 +57,7 @@ if [[ -n "$selected_index" ]]; then
         
         # Route to appropriate handler based on content type
         if is_image "$content"; then
-            ~/.local/bin/cliphist-rofi-img "$id"
+        ~/.local/bin/cliphist-rofi-img "$id"
         else
             echo -n "$id" | cliphist decode | wl-copy
         fi

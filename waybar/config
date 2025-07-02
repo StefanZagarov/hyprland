@@ -13,11 +13,19 @@
   "modules-right": [
     "custom/cpu-icon",
     "cpu",
+    "custom/temperature-icon",
     "temperature",
+    "custom/cpu-fan-icon",
     "custom/cpu-fan",
+    "custom/gpu-usage-icon",
     "custom/gpu-usage",
+    "custom/gpu-temp-icon",
     "custom/gpu-temp",
+    "custom/vram-icon",
+    "custom/vram",
+    "custom/memory-icon",
     "memory",
+    "custom/volume-icon",
     "pulseaudio"
   ],
   "custom/cpu-icon": {
@@ -28,38 +36,66 @@
     "format": "{usage}%",
     "tooltip": false
   },
+  "custom/temperature-icon": {
+    "format": ""
+  },
   "temperature": {
     "hwmon-path": "/sys/class/hwmon/hwmon5/temp1_input",
     "critical-threshold": 95,
-    "format": " {temperatureC}°C",
+    "format": "{temperatureC}°C",
     "interval": 2
+  },
+  "custom/cpu-fan-icon": {
+    "format": "󰈐"
   },
   "custom/cpu-fan": {
     "exec": "sensors | grep 'CPU Fan:' | awk '{ current=$3; min=335; max=1780; if (current < min) current=min; percentage=((current - min) / (max - min)) * 100; print int(percentage) }'",
-    "format": "󰈐 {}%",
+    "format": "{}%",
     "interval": 2
+  },
+  "custom/gpu-usage-icon": {
+    "format": "󰢮"
   },
   "custom/gpu-usage": {
     "exec": "awk '{print $1*100}' /sys/class/drm/card0/device/gpu_busy_percent",
-    "format": "GPU {}%",
+    "format": "{}%",
     "interval": 2
+  },
+  "custom/gpu-temp-icon": {
+    "format": "󱃃"
   },
   "custom/gpu-temp": {
     "exec": "cat /sys/class/hwmon/hwmon3/temp2_input | awk '{print $1 / 1000}'",
     "format": "{}°C",
     "interval": 2
   },
+  "custom/vram-icon": {
+    "format": "󰍛"
+  },
+  "custom/vram": {
+    "exec": "awk '{printf \"%.1f\", $1/1073741824}' /sys/class/drm/card0/device/mem_info_vram_used",
+    "format": "{}GB",
+    "interval": 2
+  },
+  "custom/volume-icon": {
+    "format": "󰕾"
+  },
+  "custom/memory-icon": {
+    "format": "󰍛"
+  },
   "memory": {
     "interval": 2,
-    "format": " {used:0.1f}GB"
+    "format": "{used:0.1f}GB"
   },
   "pulseaudio": {
     "format": "{icon} {volume}%",
-    "format-muted": "🔇",
+    "format-muted": "",
     "format-icons": {
       "headphones": "🎧",
-      "speaker": "🔊",
-      "muted": "🔇"
+      "high": "",
+      "medium": "",
+      "low": "",
+      "muted": "󰖁"
     }
   },
   "mode": "dock",
