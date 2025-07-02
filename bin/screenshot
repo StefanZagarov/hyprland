@@ -1,2 +1,11 @@
 #!/bin/bash
-grim -g "$(slurp)" /home/war/Pictures/Screenshots/screenshot-$(date +%F-%T).png
+
+# Take screenshot with area selection
+screenshot_path="/home/war/Pictures/Screenshots/screenshot-$(date +%F-%T).png"
+grim -g "$(slurp)" "$screenshot_path"
+
+# Check if screenshot was actually taken (user didn't cancel)
+if [[ -f "$screenshot_path" ]]; then
+    # Copy screenshot path to clipboard automatically
+    echo -n "file://$screenshot_path" | wl-copy --type "text/uri-list"
+fi
