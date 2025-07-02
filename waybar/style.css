@@ -2,7 +2,6 @@
 * {
     font-family: "JetBrainsMono Nerd Font Mono", monospace;
     font-size: 14px;
-
     padding: 0;
     margin: 0;
     border: none;
@@ -26,19 +25,16 @@ window#waybar {
 }
 
 /* LEFT MODULES */
-
 .modules-left {
     margin-left: 1rem;
 }
 
 /* MIDDLE MODULES */
-
 #clock {
     color: #ffffff;
 }
 
 /* RIGHT MODULES */
-
 .modules-right {
     margin-right: 1rem;
 }
@@ -51,142 +47,114 @@ window#waybar {
     margin-right: 0;
 }
 
-#cpu-module {
-    background-color: #ff0000;
-    font-size: 40px;
-}
-
-#custom-cpu-icon {
-    background-color: #A886E9;
-    border: 2px solid #6311fc;
-    border-right: none;
-    border-radius: 5rem 0 0 5rem;
-    padding: 0 0.2rem 0 0.5rem;
-    font-size: 20px;
-    margin-right: 0;
-}
-
-#cpu {
-    background-color: #A886E9;
-    border: 2px solid #6311fc;
-    border-left: none;
-    border-radius: 0 5rem 5rem 0;
-    padding: 0 0.5rem 0 0.2rem;
-}
-
-#custom-temperature-icon {
-    background-color: #d37171;
-    border: 2px solid #bb0606;
-    border-right: none;
-    border-radius: 5rem 0 0 5rem;
-    padding: 0 0.2rem 0 0.5rem;
-    font-size: 20px;
-    margin-right: 0;
-}
-
-#temperature {
-    background-color: #d37171;
-    border: 2px solid #bb0606;
-    border-left: none;
-    border-radius: 0 5rem 5rem 0;
-    padding: 0 0.5rem 0 0.2rem;
-}
-
-#custom-cpu-fan-icon {
-    background-color: #618fe6;
-    border: 2px solid rgb(2, 13, 170);
-    border-right: none;
-    border-radius: 5rem 0 0 5rem;
-    padding: 0 0.2rem 0 0.5rem;
-    font-size: 20px;
-    margin-right: 0;
-    color: #001629;
-}
-
-#custom-cpu-fan {
-    background-color: #618fe6;
-    border: 2px solid rgb(2, 13, 170);
-    border-left: none;
-    border-radius: 0 5rem 5rem 0;
-    padding: 0 0.5rem 0 0.2rem;
-    color: #001629;
-}
-
-#custom-gpu-usage-icon {
-    background-color: #ffb366;
-    border: 2px solid #e67300;
-    border-right: none;
-    border-radius: 5rem 0 0 5rem;
-    padding: 0 0.2rem 0 0.5rem;
-    font-size: 20px;
-    margin-right: 0;
-}
-
-#custom-gpu-usage {
-    background-color: #ffb366;
-    border: 2px solid #e67300;
-    border-left: none;
-    border-radius: 0 5rem 5rem 0;
-    padding: 0 0.5rem 0 0.2rem;
-}
-
-#custom-gpu-temp-icon {
-    background-color: #f0d866;
-    border: 2px solid #d4af00;
-    border-right: none;
-    border-radius: 5rem 0 0 5rem;
-    padding: 0 0.2rem 0 0.5rem;
-    font-size: 20px;
-    margin-right: 0;
-}
-
-#custom-gpu-temp {
-    background-color: #f0d866;
-    border: 2px solid #d4af00;
-    border-left: none;
-    border-radius: 0 5rem 5rem 0;
-    padding: 0 0.5rem 0 0.2rem;
-}
-
-#custom-vram-icon {
-    background-color: #67d3f0;
-    border: 2px solid #0891b2;
-    border-right: none;
-    border-radius: 5rem 0 0 5rem;
-    padding: 0 0.2rem 0 0.5rem;
-    font-size: 20px;
-    margin-right: 0;
-}
-
-#custom-vram {
-    background-color: #67d3f0;
-    border: 2px solid #0891b2;
-    border-left: none;
-    border-radius: 0 5rem 5rem 0;
-    padding: 0 0.5rem 0 0.2rem;
-}
-
+/* SHARED STYLES FOR ALL ICON MODULES */
+#custom-cpu-icon,
+#custom-temperature-icon,
+#custom-cpu-fan-icon,
+#custom-gpu-usage-icon,
+#custom-gpu-temp-icon,
+#custom-vram-icon,
+#custom-memory-icon,
 #custom-volume-icon {
-    background-color: #e879a6;
-    border: 2px solid #c21e56;
+    border-width: 2px;
+    border-style: solid;
     border-right: none;
     border-radius: 5rem 0 0 5rem;
     padding: 0 0.2rem 0 0.5rem;
-    font-size: 20px;
     margin-right: 0;
+}
+
+/* SHARED STYLES FOR ALL TEXT MODULES */
+#cpu,
+#temperature,
+#custom-cpu-fan,
+#custom-gpu-usage,
+#custom-gpu-temp,
+#custom-vram,
+#memory,
+#pulseaudio {
+    border-width: 2px;
+    border-style: solid;
+    border-left: none;
+    border-radius: 0 5rem 5rem 0;
+    padding: 0 0.5rem 0 0.2rem;
+    margin-right: 0.5rem;
 }
 
 #pulseaudio {
-    background-color: #e879a6;
-    border: 2px solid #c21e56;
-    border-left: none;
-    border-radius: 0 5rem 5rem 0;
-    padding: 0 0.5rem 0 0.2rem;
+    margin-right: 0;
 }
 
+/* MODULE-SPECIFIC COLORS AND OVERRIDES */
+/* CPU */
+#custom-cpu-icon,
+#cpu {
+    background-color: #A886E9;
+    border-color: #6311fc;
+    color: #2d1b69;
+}
+
+#custom-cpu-icon {
+    /* font-size: 24px; */
+}
+
+/* Temperature */
+#custom-temperature-icon,
+#temperature {
+    background-color: #d37171;
+    border-color: #bb0606;
+    color: #5c1a1a;
+}
+
+/* CPU Fan */
+#custom-cpu-fan-icon,
+#custom-cpu-fan {
+    background-color: #618fe6;
+    border-color: rgb(2, 13, 170);
+    color: #001629;
+}
+
+/* GPU Usage */
+#custom-gpu-usage-icon,
+#custom-gpu-usage {
+    background-color: #ffb366;
+    border-color: #e67300;
+    color: #663300;
+}
+
+/* GPU Temp */
+#custom-gpu-temp-icon,
+#custom-gpu-temp {
+    background-color: #f0d866;
+    border-color: #d4af00;
+    color: #5c4700;
+}
+
+/* VRAM */
+#custom-vram-icon,
+#custom-vram {
+    background-color: #67d3f0;
+    border-color: #0891b2;
+    color: #0c4a5e;
+}
+
+/* Memory */
+#custom-memory-icon,
+#memory {
+    background-color: #4db456;
+    border-color: #14c523;
+    color: #0d4d15;
+}
+
+/* Volume */
+#custom-volume-icon,
+#pulseaudio {
+    background-color: #79a0e8;
+    border-color: #1e65c2;
+    color: #0f2a5a;
+}
 
 /* WORKSPACES */
-
 #workspaces {
     background-color: rgba(119, 119, 119, 0.5);
     border-radius: 5rem;
@@ -204,29 +172,4 @@ window#waybar {
 
 #workspaces button.active {
     background-color: rgb(63, 63, 63);
-}
-
-#custom-hardware-cpu,
-#custom-hardware-gpu {
-    background-color: #363636;
-    border-radius: 5rem;
-    padding: 0 0.5rem;
-}
-
-#custom-memory-icon {
-    background-color: #4db456;
-    border: 2px solid #14c523;
-    border-right: none;
-    border-radius: 5rem 0 0 5rem;
-    padding: 0 0.2rem 0 0.5rem;
-    font-size: 20px;
-    margin-right: 0;
-}
-
-#memory {
-    background-color: #4db456;
-    border: 2px solid #14c523;
-    border-left: none;
-    border-radius: 0 5rem 5rem 0;
-    padding: 0 0.5rem 0 0.2rem;
 }
