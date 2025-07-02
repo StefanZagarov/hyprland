@@ -70,7 +70,7 @@
     "interval": 2
   },
   "custom/vram-icon": {
-    "format": "󰍛"
+    "format": "󰾆"
   },
   "custom/vram": {
     "exec": "awk '{printf \"%.1f\", $1/1073741824}' /sys/class/drm/card0/device/mem_info_vram_used",
