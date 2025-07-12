@@ -4,6 +4,13 @@
   "modules-left": [
     "hyprland/workspaces"
   ],
+  "hyprland/workspaces": {
+    "format": "{icon}",
+    "format-icons": {
+      "default": "",
+      "active": "•"
+    }
+  },
   "modules-center": [
     "clock"
   ],
@@ -17,41 +24,40 @@
     "temperature",
     "custom/cpu-fan-icon",
     "custom/cpu-fan",
-    "custom/gpu-usage-icon",
-    "custom/gpu-usage",
-    "custom/gpu-temp-icon",
-    "custom/gpu-temp",
-    "custom/vram-icon",
-    "custom/vram",
     "custom/memory-icon",
     "memory",
     "custom/volume-icon",
-    "pulseaudio"
+    "pulseaudio",
+    "custom/power"
   ],
   "custom/cpu-icon": {
-    "format": ""
+    "format": "",
+    "tooltip-format": "CPU Usage"
   },
   "cpu": {
-    "interval": 2,
-    "format": "{usage}%",
-    "tooltip": false
+    "interval": 1,
+    "format": "{usage}%"
   },
   "custom/temperature-icon": {
-    "format": ""
+    "format": "",
+    "tooltip-format": "CPU Temperature"
   },
   "temperature": {
     "hwmon-path": "/sys/class/hwmon/hwmon5/temp1_input",
     "critical-threshold": 95,
+    "interval": 1,
     "format": "{temperatureC}°C",
-    "interval": 2
+    "tooltip-format": "CPU Temperature"
   },
   "custom/cpu-fan-icon": {
-    "format": "󰈐"
+    "format": "󰈐",
+    "tooltip-format": "CPU Fan Speed"
   },
   "custom/cpu-fan": {
     "exec": "sensors | grep 'CPU Fan:' | awk '{ current=$3; min=335; max=1780; if (current < min) current=min; percentage=((current - min) / (max - min)) * 100; print int(percentage) }'",
     "format": "{}%",
-    "interval": 2
+    "interval": 1,
+    "tooltip-format": "CPU Fan Speed"
   },
   "custom/gpu-usage-icon": {
     "format": "󰢮"
@@ -59,7 +65,7 @@
   "custom/gpu-usage": {
     "exec": "awk '{print $1*100}' /sys/class/drm/card0/device/gpu_busy_percent",
     "format": "{}%",
-    "interval": 2
+    "interval": 1
   },
   "custom/gpu-temp-icon": {
     "format": "󱃃"
@@ -67,7 +73,7 @@
   "custom/gpu-temp": {
     "exec": "cat /sys/class/hwmon/hwmon3/temp2_input | awk '{print $1 / 1000}'",
     "format": "{}°C",
-    "interval": 2
+    "interval": 1
   },
   "custom/vram-icon": {
     "format": "󰾆"
@@ -75,17 +81,20 @@
   "custom/vram": {
     "exec": "awk '{printf \"%.1f\", $1/1073741824}' /sys/class/drm/card0/device/mem_info_vram_used",
     "format": "{}GB",
-    "interval": 2
+    "interval": 1
   },
   "custom/memory-icon": {
-    "format": ""
+    "format": "",
+    "tooltip-format": "RAM Usage"
   },
   "memory": {
-    "interval": 2,
-    "format": "{used:0.1f}GB"
+    "interval": 1,
+    "format": "{used:0.1f}GB",
+    "tooltip-format": "RAM Usage"
   },
   "custom/volume-icon": {
-    "format": "󰕾"
+    "format": "󰕾",
+    "tooltip-format": "Volume Level"
   },
   "pulseaudio": {
     "format": "{icon} {volume}%",
@@ -93,6 +102,12 @@
     "format-icons": {
       "headphones": "󰋋"
     }
+  },
+  "custom/power": {
+    "format": "⏻",
+    "tooltip": false,
+    "on-click": "wlogout",
+    "interval": 86400
   },
   "mode": "dock",
   "reload_style_on_change": true

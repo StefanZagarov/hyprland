@@ -173,3 +173,23 @@ window#waybar {
 #workspaces button.active {
     background-color: rgb(63, 63, 63);
 }
+
+/* Power Button */
+#custom-power {
+    background-color: #f38ba8;
+    /* Reddish color to indicate power/shutdown */
+    color: #181825;
+    /* Dark text/icon color */
+    border-radius: 5rem;
+    padding: 0 0.5rem;
+    margin-left: 0.5rem;
+    /* Space it from other modules */
+}
+
+#custom-power:hover {
+    background-color: #f7768e;
+    /* Lighter red on hover */
+}
+
+/* TODO: Decide how to handle the icons, maybe find bigger icons */
+/* TODO NEXT: Power button script was added to bin, integrate and test it if it will work, it is not executable yet */

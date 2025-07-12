@@ -1,0 +1,10 @@
+#!/bin/bash
+
+# Simple power menu using rofi (install rofi if using this)
+chosen=$(echo -e "Logout\nRestart\nShutdown" | rofi -dmenu -p "Power Menu")
+
+case "$chosen" in
+  "Logout") hyprctl dispatch exit ;;
+  "Restart") systemctl reboot ;;
+  "Shutdown") systemctl poweroff ;;
+esac
