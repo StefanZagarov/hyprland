@@ -7,9 +7,15 @@
   "hyprland/workspaces": {
     "format": "{icon}",
     "format-icons": {
-      "default": "",
-      "active": "•"
-    }
+      "default": "●",
+      "active": "●",
+      "empty": "○"
+    },
+    "persistent-workspaces": {
+      "*": 10
+    },
+    "all-outputs": true,
+    "sort-by": "number"
   },
   "modules-center": [
     "clock"
