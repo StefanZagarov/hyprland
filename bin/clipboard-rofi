@@ -1,117 +1,159 @@
 #!/usr/bin/env bash
 
-# Check if content is an image (same logic as cliphist-rofi-img)
+# Constants
+readonly IMG_PATTERN='\.(jpg|JPG|jpeg|JPEG|png|PNG|bmp|BMP|gif|GIF|webp|WEBP|tiff|TIFF|tif|TIF|svg|SVG|ico|ICO|avif|AVIF|heic|HEIC|heif|HEIF|jfif|JFIF|psd|PSD|raw|RAW|cr2|CR2|nef|NEF|dng|DNG)$'
+readonly BINARY_IMG_PATTERN='\[\[.*binary.*data.*(image|jpg|jpeg|png|bmp|gif|webp|tiff|svg|ico|avif|heic)'
+readonly tmp_dir="/tmp/cliphist"
+
+# Simple image detection
 is_image() {
     local content="$1"
-    [[ "$content" =~ \[\[.*binary.*data.*(image|jpg|jpeg|png|bmp|gif|webp|tiff|svg|ico|avif|heic) ]] && return 0
+    [[ "$content" =~ $BINARY_IMG_PATTERN ]] && return 0
     [[ "$content" =~ ^data:image/ ]] && return 0
-    [[ "$content" =~ ^(https?|ftp):// ]] && [[ "$content" =~ \.(jpg|JPG|jpeg|JPEG|png|PNG|bmp|BMP|gif|GIF|webp|WEBP|tiff|TIFF|tif|TIF|svg|SVG|ico|ICO|avif|AVIF|heic|HEIC|heif|HEIF|jfif|JFIF|psd|PSD|raw|RAW|cr2|CR2|nef|NEF|dng|DNG)$ ]] && return 0
-    [[ "$content" =~ ^file://.* ]] && [[ "$content" =~ \.(jpg|JPG|jpeg|JPEG|png|PNG|bmp|BMP|gif|GIF|webp|WEBP|tiff|TIFF|tif|TIF|svg|SVG|ico|ICO|avif|AVIF|heic|HEIC|heif|HEIF|jfif|JFIF|psd|PSD|raw|RAW|cr2|CR2|nef|NEF|dng|DNG)$ ]] && return 0
-    [[ "$content" =~ \.(jpg|JPG|jpeg|JPEG|png|PNG|bmp|BMP|gif|GIF|webp|WEBP|tiff|TIFF|tif|TIF|svg|SVG|ico|ICO|avif|AVIF|heic|HEIC|heif|HEIF|jfif|JFIF|psd|PSD|raw|RAW|cr2|CR2|nef|NEF|dng|DNG)$ ]] && return 0
+    [[ "$content" =~ ^(https?|ftp):// ]] && [[ "$content" =~ $IMG_PATTERN ]] && return 0
+    [[ "$content" =~ ^file://.* ]] && [[ "$content" =~ $IMG_PATTERN ]] && return 0
+    [[ "$content" =~ $IMG_PATTERN ]] && return 0
     return 1
 }
 
-# Use same directory as cliphist-rofi-img for organization
-tmp_dir="/tmp/cliphist"
+# Get icon path for image content
+get_image_icon() {
+    local id="$1" content="$2"
+    
+    # Binary images: create/use preview file
+    if [[ "$content" =~ $BINARY_IMG_PATTERN ]]; then
+        local preview="$tmp_dir/${id}.png"
+        [[ ! -f "$preview" ]] && echo -n "$id" | cliphist decode > "$preview"
+        echo "$preview"
+        return
+    fi
+    
+    # File URLs and local paths: use actual file if exists
+    local filepath="$content"
+    [[ "$content" =~ ^file://.* ]] && filepath="${content#file://}"
+    [[ ! "$filepath" =~ ^/ ]] && filepath="$HOME/$content"
+    
+    if [[ -f "$filepath" ]]; then
+        echo "$filepath"
+    else
+        echo "image-x-generic"
+    fi
+}
+
 mkdir -p "$tmp_dir"
 
-# Get clipboard list
+# Get and clean clipboard list once
 clipboard_list=$(cliphist list)
 
-# Delete any HTML meta tag entries to prevent bloat
-echo "$clipboard_list" | while IFS=$'\t' read -r id content; do
-    if [[ "$content" =~ ^'<meta http-equiv=' ]]; then
-        echo "$id" | cliphist delete
-    fi
-done
-
-# Update clipboard list after meta tag cleanup
-clipboard_list=$(cliphist list)
-
-# Limit clipboard to 200 items - delete oldest entries if over limit
-item_count=$(echo "$clipboard_list" | wc -l)
-if [[ "$item_count" -gt 200 ]]; then
-    echo "Clipboard has $item_count items, trimming to 200..."
-    # Get the oldest items (beyond the first 200) and delete them
-    echo "$clipboard_list" | tail -n +201 | while IFS=$'\t' read -r id content; do
-        echo "$id" | cliphist delete
-        # Also delete associated preview files from tmp/cliphist if they exist
-        preview_file="$tmp_dir/${id}.png"
-        [[ -f "$preview_file" ]] && rm -f "$preview_file"
-    done
-    # Update clipboard list after trimming
-    clipboard_list=$(cliphist list)
-fi
-
-# Check if tmp/cliphist image files exist in clipboard list, delete if not
-for image_file in "$tmp_dir"/*.png; do
-    [[ -f "$image_file" ]] || continue
-    filename=$(basename "$image_file" .png)
-    # Check if ID exists OR if any entry references this file
-    if ! echo "$clipboard_list" | grep -q "^$filename[[:space:]]" && \
-       ! echo "$clipboard_list" | grep -q "file://$image_file"; then
-        rm -f "$image_file"
-    fi
-done
-
-# Create temporary file in the cliphist directory
-tmp_combined="$tmp_dir/rofi_combined_$$"
-
-# Clean up temporary files on exit
-trap 'rm -f "$tmp_combined"' EXIT
-
-# Process entries in chronological order (newest first)
-echo "$clipboard_list" | while IFS=$'\t' read -r id content; do
-
-    
-    if is_image "$content"; then
-        # Format image entry (simplified from cliphist-rofi-img logic)
-        if [[ "$content" =~ \[\[.*binary.*data.*(image|jpg|jpeg|png|bmp|gif|webp|tiff|svg|ico|avif|heic) ]]; then
-            preview="$tmp_dir/${id}.png"
-            [[ ! -f "$preview" ]] && echo -n "$id" | cliphist decode > "$preview"
-            printf '%s\t%s\000icon\037%s\n' "$id" "$content" "$preview"
-        elif [[ "$content" =~ ^data:image/ ]]; then
-            printf '%s\t%s\000icon\037image-x-generic\n' "$id" "$content"
-        elif [[ "$content" =~ ^(https?|ftp):// ]] && [[ "$content" =~ \.(jpg|JPG|jpeg|JPEG|png|PNG|bmp|BMP|gif|GIF|webp|WEBP|tiff|TIFF|tif|TIF|svg|SVG|ico|ICO|avif|AVIF|heic|HEIC|heif|HEIF|jfif|JFIF|psd|PSD|raw|RAW|cr2|CR2|nef|NEF|dng|DNG)$ ]]; then
-            printf '%s\t%s\000icon\037image-x-generic\n' "$id" "$content"
-        elif [[ "$content" =~ ^file://.* ]] && [[ "$content" =~ \.(jpg|JPG|jpeg|JPEG|png|PNG|bmp|BMP|gif|GIF|webp|WEBP|tiff|TIFF|tif|TIF|svg|SVG|ico|ICO|avif|AVIF|heic|HEIC|heif|HEIF|jfif|JFIF|psd|PSD|raw|RAW|cr2|CR2|nef|NEF|dng|DNG)$ ]]; then
-            filepath="${content#file://}"
-            if [[ -f "$filepath" ]]; then
-                printf '%s\t%s\000icon\037%s\n' "$id" "$content" "$filepath"
-            else
-                printf '%s\t%s\000icon\037image-x-generic\n' "$id" "$content"
-            fi
-        elif [[ "$content" =~ \.(jpg|JPG|jpeg|JPEG|png|PNG|bmp|BMP|gif|GIF|webp|WEBP|tiff|TIFF|tif|TIF|svg|SVG|ico|ICO|avif|AVIF|heic|HEIC|heif|HEIF|jfif|JFIF|psd|PSD|raw|RAW|cr2|CR2|nef|NEF|dng|DNG)$ ]]; then
-            filepath="$content"
-            [[ ! "$filepath" =~ ^/ ]] && filepath="$HOME/$content"
-            if [[ -f "$filepath" ]]; then
-                printf '%s\t%s\000icon\037%s\n' "$id" "$content" "$filepath"
-            else
-                printf '%s\t%s\000icon\037image-x-generic\n' "$id" "$content"
-            fi
+# Combined cleanup: meta tags + 200 item limit - track changes to avoid second cliphist call
+declare -A deleted_ids
+{
+    echo "$clipboard_list" | while IFS=$'\t' read -r id content; do
+        # Delete meta tags
+        if [[ "$content" =~ ^'<meta http-equiv=' ]]; then
+            echo "$id" | cliphist delete
+            deleted_ids["$id"]=1
         fi
+    done
+    
+    # Trim to 200 items if needed
+    item_count=$(echo "$clipboard_list" | wc -l)
+    if [[ "$item_count" -gt 200 ]]; then
+        echo "Clipboard has $item_count items, trimming to 200..."
+        echo "$clipboard_list" | tail -n +201 | while IFS=$'\t' read -r id content; do
+            echo "$id" | cliphist delete
+            deleted_ids["$id"]=1
+            rm -f "$tmp_dir/${id}.png"  # Clean preview file
+        done
+    fi
+}
+
+# Filter out deleted entries from clipboard_list instead of calling cliphist list again
+filtered_clipboard=""
+while IFS=$'\t' read -r id content; do
+    [[ -z "${deleted_ids[$id]}" ]] && filtered_clipboard+="$id"$'\t'"$content"$'\n'
+done <<< "$clipboard_list"
+clipboard_list="$filtered_clipboard"
+
+# Optimized orphaned file cleanup with hash table - accounts for file URL references
+declare -A valid_ids
+while IFS=$'\t' read -r id content; do
+    valid_ids["$id"]=1
+    # Also mark files referenced by file:// URLs as valid
+    if [[ "$content" =~ ^file://.*/tmp/cliphist/([0-9]+)\.png$ ]]; then
+        valid_ids["${BASH_REMATCH[1]}"]=1
+    fi
+done <<< "$clipboard_list"
+
+# Clean orphaned files with O(1) lookups
+for png_file in "$tmp_dir"/*.png; do
+    [[ -f "$png_file" ]] || continue
+    filename=$(basename "$png_file" .png)
+    [[ -z "${valid_ids[$filename]}" ]] && rm -f "$png_file"
+done
+
+# Create temporary file
+tmp_combined="$tmp_dir/rofi_combined_$$"
+trap 'rm -f "$tmp_combined" "$tmp_dir/content_cache_$$"' EXIT
+
+# Process entries efficiently - build safe content cache
+declare -A content_cache
+content_cache_file="$tmp_dir/content_cache_$$"
+> "$content_cache_file"  # Clear cache file
+
+echo "$clipboard_list" | while IFS=$'\t' read -r id content; do
+    # Store content in cache with safe base64 encoding for special chars
+    content_b64=$(printf '%s' "$content" | base64 -w 0)
+    content_cache["$id"]="$content_b64"
+    
+    # Cache image detection result to avoid redundant calls
+    if is_image "$content"; then
+        is_img="1"
+        icon=$(get_image_icon "$id" "$content")
+        printf '%s\t%s\000icon\037%s\n' "$id" "$content" "$icon"
     else
-        # Format text entry
+        is_img="0"
         printf '%s\t%s\000icon\037text-x-generic\n' "$id" "$content"
     fi
+    
+    # Write to cache file safely with image detection result
+    printf '%s\t%s\t%s\n' "$id" "$content_b64" "$is_img" >> "$content_cache_file"
 done > "$tmp_combined"
 
 # Exit if no entries
 [[ ! -s "$tmp_combined" ]] && exit 0
 
-# Show in rofi and get index
-selected_index=$(cat "$tmp_combined" | rofi -dmenu -show-icons -p "Clipboard" -format "i")
+# Show in rofi and process selection
+selected_index=$(rofi -dmenu -show-icons -p "Clipboard" -format "i" < "$tmp_combined")
 
-# Process selection
 if [[ -n "$selected_index" ]]; then
     selected_line=$(sed -n "$((selected_index + 1))p" "$tmp_combined")
     if [[ "$selected_line" =~ ^([0-9]+) ]]; then
         id="${BASH_REMATCH[1]}"
-        content=$(cliphist list | grep "^$id" | cut -f2-)
         
-        # Route to appropriate handler based on content type
-        if is_image "$content"; then
-        ~/.local/bin/cliphist-rofi-img "$id"
+        # Load content and image detection result from cache with O(1) lookup
+        content_cache_file="$tmp_dir/content_cache_$$"
+        if [[ -f "$content_cache_file" ]]; then
+            # Safe lookup using grep on cache file + base64 decode
+            cache_line=$(grep "^$id"$'\t' "$content_cache_file")
+            if [[ -n "$cache_line" ]]; then
+                content_b64=$(echo "$cache_line" | cut -f2)
+                is_img_cached=$(echo "$cache_line" | cut -f3)
+                content=$(printf '%s' "$content_b64" | base64 -d)
+            else
+                # Fallback to grep if ID not in cache
+                content=$(echo "$clipboard_list" | grep "^$id" | cut -f2-)
+                is_img_cached=""
+            fi
+        else
+            # Fallback to grep if cache unavailable
+            content=$(echo "$clipboard_list" | grep "^$id" | cut -f2-)
+            is_img_cached=""
+        fi
+        
+        # Route to appropriate handler using cached result or fallback
+        if [[ "$is_img_cached" == "1" ]] || { [[ -z "$is_img_cached" ]] && is_image "$content"; }; then
+            ~/.local/bin/cliphist-rofi-img "$id"
         else
             echo -n "$id" | cliphist decode | wl-copy
             echo "$id" | cliphist delete
