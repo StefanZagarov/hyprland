@@ -1,0 +1,64 @@
+#!/usr/bin/env bash
+
+# Reset cliphist database on boot to remap items to new IDs chronologically
+# This script should be run at system startup
+
+CLIPHIST_DB="$HOME/.cache/cliphist/db"
+TMP_DIR="/tmp/cliphist"
+BACKUP_DIR="$TMP_DIR/boot_reset_$$"
+
+# Check if cliphist database exists
+if [[ ! -f "$CLIPHIST_DB" ]]; then
+    echo "No cliphist database found, nothing to reset"
+    exit 0
+fi
+
+# Get current clipboard list
+clipboard_list=$(cliphist list 2>/dev/null)
+if [[ -z "$clipboard_list" ]]; then
+    echo "No clipboard history found, nothing to reset"
+    exit 0
+fi
+
+# Get highest ID for logging
+highest_id=$(echo "$clipboard_list" | head -1 | cut -f1)
+
+echo "Resetting cliphist database to remap IDs (current highest: $highest_id)..."
+
+# Create backup directory (ensure tmp/cliphist exists first)
+mkdir -p "$TMP_DIR"
+mkdir -p "$BACKUP_DIR"
+
+# Save all current clipboard items
+echo "$clipboard_list" | while IFS=$'\t' read -r id content; do
+    echo -n "$id" | cliphist decode > "$BACKUP_DIR/$id" 2>/dev/null
+done
+
+# Stop cliphist store processes to ensure clean reset
+pkill -f "wl-paste --watch cliphist store" 2>/dev/null
+
+# Delete the database to reset counter
+rm -f "$CLIPHIST_DB"
+
+# Wait a moment for database to be fully cleared
+sleep 0.5
+
+# Restore items in reverse order (oldest first) to maintain chronological order
+echo "$clipboard_list" | tac | while IFS=$'\t' read -r id content; do
+    if [[ -f "$BACKUP_DIR/$id" ]]; then
+        cat "$BACKUP_DIR/$id" | wl-copy 2>/dev/null
+        sleep 0.02  # Small delay to ensure proper ordering
+    fi
+done
+
+# Restart cliphist store processes
+nohup wl-paste --watch cliphist store >/dev/null 2>&1 &
+
+# Clean up backup
+rm -rf "$BACKUP_DIR"
+
+# Get new highest ID
+new_clipboard_list=$(cliphist list 2>/dev/null)
+new_highest_id=$(echo "$new_clipboard_list" | head -1 | cut -f1)
+
+echo "Database reset complete. Items remapped to IDs 1-$new_highest_id" 

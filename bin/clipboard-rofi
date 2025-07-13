@@ -28,6 +28,21 @@ done
 # Update clipboard list after meta tag cleanup
 clipboard_list=$(cliphist list)
 
+# Limit clipboard to 200 items - delete oldest entries if over limit
+item_count=$(echo "$clipboard_list" | wc -l)
+if [[ "$item_count" -gt 200 ]]; then
+    echo "Clipboard has $item_count items, trimming to 200..."
+    # Get the oldest items (beyond the first 200) and delete them
+    echo "$clipboard_list" | tail -n +201 | while IFS=$'\t' read -r id content; do
+        echo "$id" | cliphist delete
+        # Also delete associated preview files from tmp/cliphist if they exist
+        preview_file="$tmp_dir/${id}.png"
+        [[ -f "$preview_file" ]] && rm -f "$preview_file"
+    done
+    # Update clipboard list after trimming
+    clipboard_list=$(cliphist list)
+fi
+
 # Check if tmp/cliphist image files exist in clipboard list, delete if not
 for image_file in "$tmp_dir"/*.png; do
     [[ -f "$image_file" ]] || continue
