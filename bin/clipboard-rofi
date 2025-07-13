@@ -15,18 +15,46 @@ is_image() {
 tmp_dir="/tmp/cliphist"
 mkdir -p "$tmp_dir"
 
-# Enhanced cleanup logic to prevent tmp_dir from filling up
-find "$tmp_dir" -name "[0-9]*.png" -type f -delete 2>/dev/null
-find "$tmp_dir" -name "rofi_*" -type f -mtime +0 -delete 2>/dev/null
-
+# Cleanup logic: keep only 200 most recent items
 clipboard_list=$(cliphist list)
 
-# Clean up clipboard files that are no longer referenced in clipboard history
-while IFS= read -r -d '' file; do
-    grep -q "file://$file" <<< "$clipboard_list" || rm -f "$file"
-done < <(find "$tmp_dir" -name "clipboard_image_*.png" -type f -print0 2>/dev/null)
+# First, delete any HTML meta tag entries to prevent bloat
+echo "$clipboard_list" | while IFS=$'\t' read -r id content; do
+    if [[ "$content" =~ ^'<meta http-equiv=' ]]; then
+        echo "$id" | cliphist delete
+    fi
+done
 
-# Clean up very old clipboard files (older than 24 hours)
+# Update clipboard list after meta tag cleanup
+clipboard_list=$(cliphist list)
+current_count=$(echo "$clipboard_list" | wc -l)
+
+if [ "$current_count" -gt 200 ]; then
+    # Delete all items beyond 200 (from 201 onwards)
+    echo "$clipboard_list" | tail -n +201 | while IFS=$'\t' read -r id content; do
+        # If content is a file path in /tmp/cliphist/, delete the actual file
+        if [[ "$content" =~ ^file:// ]]; then
+            file_path="${content#file://}"
+            # Only delete if it's actually in the /tmp/cliphist/ directory
+            if [[ "$file_path" == /tmp/cliphist/* ]]; then
+                [ -f "$file_path" ] && rm -f "$file_path"
+            fi
+        fi
+        
+        # Remove preview file if it exists
+        [ -f "$tmp_dir/${id}.png" ] && rm -f "$tmp_dir/${id}.png"
+        
+        # Delete from cliphist
+        echo "$id" | cliphist delete
+    done
+    
+    # Update clipboard list after all deletions
+    clipboard_list=$(cliphist list)
+fi
+
+# Clean up orphaned temp files
+find "$tmp_dir" -name "[0-9]*.png" -type f -delete 2>/dev/null
+find "$tmp_dir" -name "rofi_*" -type f -mtime +0 -delete 2>/dev/null
 find "$tmp_dir" -name "clipboard_image_*.png" -type f -mtime +1 -delete 2>/dev/null
 
 # Create temporary file in the cliphist directory
@@ -37,8 +65,7 @@ trap 'rm -f "$tmp_combined"' EXIT
 
 # Process entries in chronological order (newest first)
 echo "$clipboard_list" | while IFS=$'\t' read -r id content; do
-    # Skip HTML meta tags
-    [[ "$content" =~ ^'<meta http-equiv=' ]] && continue
+
     
     if is_image "$content"; then
         # Format image entry (simplified from cliphist-rofi-img logic)
