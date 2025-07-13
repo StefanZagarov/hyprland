@@ -15,32 +15,62 @@ is_image() {
 tmp_dir="/tmp/cliphist"
 mkdir -p "$tmp_dir"
 
-# Create temporary files in the cliphist directory
-tmp_images="$tmp_dir/rofi_images_$$"
-tmp_text="$tmp_dir/rofi_text_$$"
+# Enhanced cleanup logic to prevent tmp_dir from filling up
+find "$tmp_dir" -name "[0-9]*.png" -type f -delete 2>/dev/null
+find "$tmp_dir" -name "rofi_*" -type f -mtime +0 -delete 2>/dev/null
+
+clipboard_list=$(cliphist list)
+
+# Clean up clipboard files that are no longer referenced in clipboard history
+while IFS= read -r -d '' file; do
+    grep -q "file://$file" <<< "$clipboard_list" || rm -f "$file"
+done < <(find "$tmp_dir" -name "clipboard_image_*.png" -type f -print0 2>/dev/null)
+
+# Clean up very old clipboard files (older than 24 hours)
+find "$tmp_dir" -name "clipboard_image_*.png" -type f -mtime +1 -delete 2>/dev/null
+
+# Create temporary file in the cliphist directory
 tmp_combined="$tmp_dir/rofi_combined_$$"
 
 # Clean up temporary files on exit
-trap 'rm -f "$tmp_images" "$tmp_text" "$tmp_combined"' EXIT
+trap 'rm -f "$tmp_combined"' EXIT
 
-# Get image entries and save to temp file (preserves rofi formatting)
-~/.local/bin/cliphist-rofi-img > "$tmp_images"
-
-# Get text entries and save to temp file
-cliphist list | while IFS=$'\t' read -r id content; do
-    # Skip if this is an image (already handled by image script)
-    if ! is_image "$content"; then
+# Process entries in chronological order (newest first)
+echo "$clipboard_list" | while IFS=$'\t' read -r id content; do
+    # Skip HTML meta tags
+    [[ "$content" =~ ^'<meta http-equiv=' ]] && continue
+    
+    if is_image "$content"; then
+        # Format image entry (simplified from cliphist-rofi-img logic)
+        if [[ "$content" =~ \[\[.*binary.*data.*(image|jpg|jpeg|png|bmp|gif|webp|tiff|svg|ico|avif|heic) ]]; then
+            preview="$tmp_dir/${id}.png"
+            [[ ! -f "$preview" ]] && echo -n "$id" | cliphist decode > "$preview"
+            printf '%s\t%s\000icon\037%s\n' "$id" "$content" "$preview"
+        elif [[ "$content" =~ ^data:image/ ]]; then
+            printf '%s\t%s\000icon\037image-x-generic\n' "$id" "$content"
+        elif [[ "$content" =~ ^(https?|ftp):// ]] && [[ "$content" =~ \.(jpg|JPG|jpeg|JPEG|png|PNG|bmp|BMP|gif|GIF|webp|WEBP|tiff|TIFF|tif|TIF|svg|SVG|ico|ICO|avif|AVIF|heic|HEIC|heif|HEIF|jfif|JFIF|psd|PSD|raw|RAW|cr2|CR2|nef|NEF|dng|DNG)$ ]]; then
+            printf '%s\t%s\000icon\037image-x-generic\n' "$id" "$content"
+        elif [[ "$content" =~ ^file://.* ]] && [[ "$content" =~ \.(jpg|JPG|jpeg|JPEG|png|PNG|bmp|BMP|gif|GIF|webp|WEBP|tiff|TIFF|tif|TIF|svg|SVG|ico|ICO|avif|AVIF|heic|HEIC|heif|HEIF|jfif|JFIF|psd|PSD|raw|RAW|cr2|CR2|nef|NEF|dng|DNG)$ ]]; then
+            filepath="${content#file://}"
+            if [[ -f "$filepath" ]]; then
+                printf '%s\t%s\000icon\037%s\n' "$id" "$content" "$filepath"
+            else
+                printf '%s\t%s\000icon\037image-x-generic\n' "$id" "$content"
+            fi
+        elif [[ "$content" =~ \.(jpg|JPG|jpeg|JPEG|png|PNG|bmp|BMP|gif|GIF|webp|WEBP|tiff|TIFF|tif|TIF|svg|SVG|ico|ICO|avif|AVIF|heic|HEIC|heif|HEIF|jfif|JFIF|psd|PSD|raw|RAW|cr2|CR2|nef|NEF|dng|DNG)$ ]]; then
+            filepath="$content"
+            [[ ! "$filepath" =~ ^/ ]] && filepath="$HOME/$content"
+            if [[ -f "$filepath" ]]; then
+                printf '%s\t%s\000icon\037%s\n' "$id" "$content" "$filepath"
+            else
+                printf '%s\t%s\000icon\037image-x-generic\n' "$id" "$content"
+            fi
+        fi
+    else
+        # Format text entry
         printf '%s\t%s\000icon\037text-x-generic\n' "$id" "$content"
     fi
-done > "$tmp_text"
-
-# Combine files (images first)
-if [[ -s "$tmp_images" ]]; then
-    cat "$tmp_images" > "$tmp_combined"
-fi
-if [[ -s "$tmp_text" ]]; then
-    cat "$tmp_text" >> "$tmp_combined"
-fi
+done > "$tmp_combined"
 
 # Exit if no entries
 [[ ! -s "$tmp_combined" ]] && exit 0
@@ -60,6 +90,7 @@ if [[ -n "$selected_index" ]]; then
         ~/.local/bin/cliphist-rofi-img "$id"
         else
             echo -n "$id" | cliphist decode | wl-copy
+            echo "$id" | cliphist delete
         fi
     fi
 fi
