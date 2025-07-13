@@ -50,7 +50,7 @@ get_image_icon() {
             local filepath=$(get_valid_filepath "$content")
             if [[ -n "$filepath" ]]; then
                 echo "$filepath"
-            else
+        else
                 echo "image-x-generic"
             fi
             ;;
@@ -184,10 +184,10 @@ copy_image() {
             # Handle local file paths
             local filepath=$(get_valid_filepath "$content")
             if [[ -n "$filepath" ]]; then
-                echo -n "file://$filepath" | wl-copy --type "text/uri-list"
-            else
-                echo -n "$content" | wl-copy
-            fi
+            echo -n "file://$filepath" | wl-copy --type "text/uri-list"
+        else
+            echo -n "$content" | wl-copy
+        fi
             ;;
     esac
     
@@ -202,7 +202,7 @@ if [[ -n "$1" ]]; then
     if [[ -n "$2" ]]; then
         content="$2"
     else
-        content=$(cliphist list | grep "^$id" | cut -f2-)
+    content=$(cliphist list | grep "^$id" | cut -f2-)
     fi
     
     # Only process if it's an image

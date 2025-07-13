@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+
+# Wrapper script for reset-clipboard-ids with logging for debugging exec-once issues
+
+LOG_FILE="/tmp/reset-clipboard-ids.log"
+SCRIPT_DIR="/home/war/Arch/Hyprland/bin"
+
+# Create log with timestamp
+echo "$(date): Starting reset-clipboard-ids wrapper" >> "$LOG_FILE"
+
+# Wait for Wayland to be ready
+sleep 3
+
+# Check if we're in a Wayland session
+if [[ -z "$WAYLAND_DISPLAY" ]]; then
+    echo "$(date): ERROR - WAYLAND_DISPLAY not set" >> "$LOG_FILE"
+    exit 1
+fi
+
+# Check if cliphist is available
+if ! command -v cliphist >/dev/null 2>&1; then
+    echo "$(date): ERROR - cliphist not found in PATH" >> "$LOG_FILE"
+    exit 1
+fi
+
+# Check if wl-paste/wl-copy are available
+if ! command -v wl-paste >/dev/null 2>&1; then
+    echo "$(date): ERROR - wl-paste not found in PATH" >> "$LOG_FILE"
+    exit 1
+fi
+
+if ! command -v wl-copy >/dev/null 2>&1; then
+    echo "$(date): ERROR - wl-copy not found in PATH" >> "$LOG_FILE"
+    exit 1
+fi
+
+# Run the actual script and capture output
+echo "$(date): Running reset-clipboard-ids script" >> "$LOG_FILE"
+"$SCRIPT_DIR/reset-clipboard-ids" >> "$LOG_FILE" 2>&1
+
+# Log completion
+echo "$(date): Script completed with exit code $?" >> "$LOG_FILE" 
