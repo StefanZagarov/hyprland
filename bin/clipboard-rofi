@@ -4,6 +4,7 @@
 readonly IMG_PATTERN='\.(jpg|JPG|jpeg|JPEG|png|PNG|bmp|BMP|gif|GIF|webp|WEBP|tiff|TIFF|tif|TIF|svg|SVG|ico|ICO|avif|AVIF|heic|HEIC|heif|HEIF|jfif|JFIF|psd|PSD|raw|RAW|cr2|CR2|nef|NEF|dng|DNG)$'
 readonly BINARY_IMG_PATTERN='\[\[.*binary.*data.*(image|jpg|jpeg|png|bmp|gif|webp|tiff|svg|ico|avif|heic)'
 readonly tmp_dir="/tmp/cliphist"
+readonly MAX_ITEMS=100
 
 # Simple image detection
 is_image() {
@@ -45,39 +46,58 @@ mkdir -p "$tmp_dir"
 # Get and clean clipboard list once
 clipboard_list=$(cliphist list)
 
-# Combined cleanup: meta tags + 200 item limit - track changes to avoid second cliphist call
+# Combined cleanup: meta tags + item limit - track changes to avoid second cliphist call
 declare -A deleted_ids
-{
-    echo "$clipboard_list" | while IFS=$'\t' read -r id content; do
-        # Delete meta tags
-        if [[ "$content" =~ ^'<meta http-equiv=' ]]; then
-            echo "$id" | cliphist delete
-            deleted_ids["$id"]=1
-        fi
-    done
-    
-    # Trim to 200 items if needed
-    item_count=$(echo "$clipboard_list" | wc -l)
-    if [[ "$item_count" -gt 200 ]]; then
-        echo "Clipboard has $item_count items, trimming to 200..."
-        echo "$clipboard_list" | tail -n +201 | while IFS=$'\t' read -r id content; do
-            echo "$id" | cliphist delete
-            deleted_ids["$id"]=1
-            rm -f "$tmp_dir/${id}.png"  # Clean preview file
-        done
-    fi
-}
 
-# Filter out deleted entries from clipboard_list instead of calling cliphist list again
-filtered_clipboard=""
+# Delete meta tags - collect IDs first to avoid subshell issues
+meta_ids=()
 while IFS=$'\t' read -r id content; do
-    [[ -z "${deleted_ids[$id]}" ]] && filtered_clipboard+="$id"$'\t'"$content"$'\n'
+    if [[ "$content" =~ ^'<meta http-equiv=' ]]; then
+        meta_ids+=("$id")
+    fi
 done <<< "$clipboard_list"
-clipboard_list="$filtered_clipboard"
+
+# Delete collected meta tag IDs
+for id in "${meta_ids[@]}"; do
+    echo "$id" | cliphist delete
+    deleted_ids["$id"]=1
+done
+
+# Get updated clipboard list after metadata deletion
+if [[ ${#meta_ids[@]} -gt 0 ]]; then
+    clipboard_list=$(cliphist list)
+fi
+
+# After metadata deletion, check if items > MAX_ITEMS and delete all exceeding items
+current_count=$(echo "$clipboard_list" | wc -l)
+if [[ "$current_count" -gt "$MAX_ITEMS" ]]; then
+    echo "Clipboard has $current_count items, trimming to $MAX_ITEMS..."
+    # Get all items beyond MAX_ITEMS (oldest items) and delete them
+    excess_count=$((current_count - MAX_ITEMS))
+    excess_ids=()
+    while IFS=$'\t' read -r old_id content; do
+        excess_ids+=("$old_id")
+    done <<< "$(echo "$clipboard_list" | tail -n "$excess_count")"
+    
+    # Delete collected excess IDs
+    for old_id in "${excess_ids[@]}"; do
+        echo "Deleting excess item: $old_id"
+        echo "$old_id" | cliphist delete
+        deleted_ids["$old_id"]=1
+        rm -f "$tmp_dir/${old_id}.png"  # Clean preview file
+    done
+fi
+
+# Get updated clipboard list after cleanup - only if we deleted excess items
+if [[ ${#excess_ids[@]} -gt 0 ]]; then
+    clipboard_list=$(cliphist list)
+fi
 
 # Optimized orphaned file cleanup with hash table - accounts for file URL references
 declare -A valid_ids
 while IFS=$'\t' read -r id content; do
+    # Skip empty IDs to avoid array subscript errors
+    [[ -z "$id" ]] && continue
     valid_ids["$id"]=1
     # Also mark files referenced by file:// URLs as valid
     if [[ "$content" =~ ^file://.*/tmp/cliphist/([0-9]+)\.png$ ]]; then
@@ -97,14 +117,12 @@ tmp_combined="$tmp_dir/rofi_combined_$$"
 trap 'rm -f "$tmp_combined" "$tmp_dir/content_cache_$$"' EXIT
 
 # Process entries efficiently - build safe content cache
-declare -A content_cache
 content_cache_file="$tmp_dir/content_cache_$$"
 > "$content_cache_file"  # Clear cache file
 
 echo "$clipboard_list" | while IFS=$'\t' read -r id content; do
-    # Store content in cache with safe base64 encoding for special chars
-    content_b64=$(printf '%s' "$content" | base64 -w 0)
-    content_cache["$id"]="$content_b64"
+    # Skip empty IDs to avoid array subscript errors
+    [[ -z "$id" ]] && continue
     
     # Cache image detection result to avoid redundant calls
     if is_image "$content"; then
@@ -116,7 +134,8 @@ echo "$clipboard_list" | while IFS=$'\t' read -r id content; do
         printf '%s\t%s\000icon\037text-x-generic\n' "$id" "$content"
     fi
     
-    # Write to cache file safely with image detection result
+    # Write to cache file safely with image detection result - encode only when writing
+    content_b64=$(printf '%s' "$content" | base64 -w 0)
     printf '%s\t%s\t%s\n' "$id" "$content_b64" "$is_img" >> "$content_cache_file"
 done > "$tmp_combined"
 
@@ -153,7 +172,7 @@ if [[ -n "$selected_index" ]]; then
         
         # Route to appropriate handler using cached result or fallback
         if [[ "$is_img_cached" == "1" ]] || { [[ -z "$is_img_cached" ]] && is_image "$content"; }; then
-            ~/.local/bin/cliphist-rofi-img "$id"
+            ~/.local/bin/cliphist-rofi-img "$id" "$content"
         else
             echo -n "$id" | cliphist decode | wl-copy
             echo "$id" | cliphist delete
