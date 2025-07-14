@@ -21,7 +21,10 @@
       (power))))
 
 ;; Workspace listener for real-time updates
-(deflisten workspaces-data :initial "[]" "/home/war/Arch/Hyprland/eww/scripts/workspaces-listen")
+(deflisten workspaces-data :initial "[]" "~/Arch/Hyprland/eww/scripts/workspaces-listen")
+
+;; Power dropdown state
+(defvar power-dropdown-open false)
 
 ;; Workspaces widget with clickable dots
 (defwidget workspaces []
@@ -43,21 +46,21 @@
   (box :class "cpu-usage module-group"
        :orientation "horizontal"
        :space-evenly false
-    (label :class "cpu-icon" :text "")
+    (label :class "cpu-icon" :text "")
     (label :class "cpu-value" :text "${round(EWW_CPU.avg, 0)}%")))
 
 ;; CPU temperature widget with script updates
-(defpoll cpu-temp-data :interval "1s" :initial "N/A" "/home/war/Arch/Hyprland/eww/scripts/cpu-temp")
+(defpoll cpu-temp-data :interval "1s" :initial "N/A" "~/Arch/Hyprland/eww/scripts/cpu-temp")
 
 (defwidget cpu-temp []
   (box :class "cpu-temp module-group"
        :orientation "horizontal"
        :space-evenly false
-    (label :class "cpu-temp-icon" :text "")
+    (label :class "cpu-temp-icon" :text "")
     (label :class "cpu-temp-value" :text "${cpu-temp-data}°C")))
 
 ;; Fan speed widget with script updates
-(defpoll fan-speed-data :interval "1s" :initial "0" "/home/war/Arch/Hyprland/eww/scripts/fan-speed")
+(defpoll fan-speed-data :interval "1s" :initial "0" "~/Arch/Hyprland/eww/scripts/fan-speed")
 
 (defwidget fan-speed []
   (box :class "fan-speed module-group"
@@ -67,31 +70,50 @@
     (label :class "fan-value" :text "${fan-speed-data}%")))
 
 ;; Memory widget with script updates
-(defpoll memory-data :interval "1s" :initial "0.0" "/home/war/Arch/Hyprland/eww/scripts/memory-used")
+(defpoll memory-data :interval "1s" :initial "0.0" "~/Arch/Hyprland/eww/scripts/memory-used")
 
 (defwidget memory []
   (box :class "memory module-group"
        :orientation "horizontal"
        :space-evenly false
-    (label :class "memory-icon" :text "")
+    (label :class "memory-icon" :text "")
     (label :class "memory-value" :text "${memory-data}GB")))
 
 ;; Volume widget with script updates
-(defpoll volume-data :interval "1s" :initial "0" "/home/war/Arch/Hyprland/eww/scripts/volume-level")
+(deflisten volume-data :initial "0" "~/Arch/Hyprland/eww/scripts/volume-listen")
 
 (defwidget volume []
   (box :class "volume module-group"
        :orientation "horizontal"
        :space-evenly false
-    (label :class "volume-icon" :text "󰕾")
-    (label :class "volume-value" :text "${volume-data}%")))
+    (label :class "volume-icon" :text "${volume-data == 'MUTED' ? '󰖁' : '󰕾'}")
+    (label :class "volume-value" :text "${volume-data == 'MUTED' ? 'MUTED' : '${volume-data}%'}")))
 
-;; Power widget with clickable button
+;; Power widget with separate dropdown window
 (defwidget power []
   (box :class "power module-group"
     (button :class "power-btn"
-            :onclick "/home/war/Arch/Hyprland/bin/power-btn"
+            :onclick "eww ${power-dropdown-open ? 'close' : 'open'} power-dropdown-bg ${power-dropdown-open ? '&& eww close' : '&& eww open'} power-dropdown-window && eww update power-dropdown-open=${!power-dropdown-open}"
       (label :text "⏻"))))
+
+;; Simple transparent background to capture outside clicks
+(defwidget power-dropdown-bg []
+  (eventbox :onclick "eww close power-dropdown-window && eww close power-dropdown-bg && eww update power-dropdown-open=false"
+    (box)))
+
+(defwidget power-dropdown []
+  (box :class "power-dropdown"
+       :orientation "vertical"
+       :space-evenly false
+    (button :class "power-option logout"
+            :onclick "eww close power-dropdown-window && eww close power-dropdown-bg && eww update power-dropdown-open=false && hyprctl dispatch exit"
+      (label :text "󰍃"))
+    (button :class "power-option restart"
+            :onclick "eww close power-dropdown-window && eww close power-dropdown-bg && eww update power-dropdown-open=false && systemctl reboot"
+      (label :text "󰜉"))
+    (button :class "power-option shutdown"
+            :onclick "eww close power-dropdown-window && eww close power-dropdown-bg && eww update power-dropdown-open=false && systemctl poweroff"
+      (label :text "󰐥"))))
 
 ;; Main window with proper Wayland layer surface properties
 (defwindow bar
@@ -102,7 +124,33 @@
   :geometry (geometry :x "0%"
                       :y "0%"
                       :width "100%"
-                      :height "30px"
+                      :height "20px"
                       :anchor "top center")
   :focusable false
-  (bar)) 
+  (bar))
+
+;; Transparent background window to capture outside clicks
+(defwindow power-dropdown-bg
+  :monitor 0
+  :namespace "eww_power_dropdown_bg"
+  :layer "fg"
+  :geometry (geometry :x "0%"
+                      :y "0%"
+                      :width "100%"
+                      :height "100%"
+                      :anchor "top left")
+  :focusable false
+  (power-dropdown-bg))
+
+;; Separate dropdown window
+(defwindow power-dropdown-window
+  :monitor 0
+  :namespace "eww_power_dropdown"
+  :layer "overlay"
+  :geometry (geometry :x "0%"
+                      :y "10px"
+                      :width "50px"
+                      :height "120px"
+                      :anchor "top right")
+  :focusable false
+  (power-dropdown)) 

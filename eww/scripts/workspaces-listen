@@ -41,12 +41,12 @@ get_workspaces() {
 # Output initial state
 get_workspaces
 
-# Listen for workspace events
-socat -u UNIX-CONNECT:/run/user/$(id -u)/hypr/$HYPRLAND_INSTANCE_SIGNATURE/.socket2.sock - | while read -r line; do
-    # Only update on workspace events - use case statement instead of regex
-    case "$line" in
-        workspace*|createworkspace*|destroyworkspace*|openwindow*|closewindow*)
-            get_workspaces
-            ;;
-    esac
-done 
+# Listen for workspace events with unbuffered output
+socat -u UNIX-CONNECT:/run/user/$(id -u)/hypr/$HYPRLAND_INSTANCE_SIGNATURE/.socket2.sock - | \
+    while read -r line; do
+        case "$line" in
+            workspace*|createworkspace*|destroyworkspace*|openwindow*|closewindow*|movewindow*)
+                get_workspaces
+                ;;
+        esac
+    done 

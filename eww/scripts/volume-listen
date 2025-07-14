@@ -1,0 +1,21 @@
+#!/bin/bash
+
+# Function to get current system volume
+get_volume() {
+    volume_output=$(wpctl get-volume @DEFAULT_AUDIO_SINK@)
+    
+    # Check if muted in the same output
+    if [[ "$volume_output" == *"MUTED"* ]]; then
+        echo "MUTED"  # Mute symbol
+    else
+        echo "$volume_output" | awk '{print int($2 * 100)}'
+    fi
+}
+
+# Monitor for audio system changes
+pw-dump --monitor | while IFS= read -r line; do
+    # On any audio change, output current system volume
+    if [[ "$line" == *"channelVolumes"* ]]; then
+        get_volume        
+    fi
+done
