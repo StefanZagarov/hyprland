@@ -24,6 +24,27 @@ window {
   background-color: transparent;
 }
 
+// Layout sections
+.modules-left {
+  margin-left: 0;
+}
+
+.modules-center {
+  color: #ffffff;
+}
+
+.modules-right {
+  margin-right: 0;
+  
+  .module-group {
+    margin-right: 0.5rem;
+    
+    &:last-child {
+      margin-right: 0;
+    }
+  }
+}
+
 // Left side - Workspaces
 .workspaces {
   background-color: rgba(84, 84, 84, 0.5);
@@ -71,76 +92,65 @@ window {
   color: #ffffff;
 }
 
-// Right side - System modules
-.sidestuff {
-  margin-right: 1rem;
+// Common styling for all module groups
+.module-group {
+  label:first-child {
+    border-width: 2px;
+    border-right: none;
+    border-radius: 5rem 0 0 5rem;
+    padding: 0 0.2rem 0 0.5rem;
+    margin-right: 0;
+    border-style: solid;
+  }
   
-  .module {
-    margin-right: 0.5rem;
-    
-    &:last-child {
-      margin-right: 0;
-    }
-    
-    // Style for modules with icon + value pairs
-    label:first-child {
-      border-width: 2px;
-      border-right: none;
-      border-radius: 5rem 0 0 5rem;
-      padding: 0 0.2rem 0 0.5rem;
-      margin-right: 0;
-      border-style: solid;
-    }
-    
-    label:last-child {
-      border-width: 2px;
-      border-left: none;
-      border-radius: 0 5rem 5rem 0;
-      padding: 0 0.5rem 0 0.2rem;
-      margin-right: 0;
-      border-style: solid;
-    }
+  label:last-child {
+    border-width: 2px;
+    border-left: none;
+    border-radius: 0 5rem 5rem 0;
+    padding: 0 0.5rem 0 0.2rem;
+    margin-right: 0;
+    border-style: solid;
   }
 }
 
-// CPU module
-.cpu-module label {
+// CPU Usage module
+.cpu-usage label {
   background-color: #A886E9;
   border-color: #6311fc;
   color: #2d1b69;
 }
 
-// Temperature module
-.temp-module label {
+// CPU Temperature module
+.cpu-temp label {
   background-color: #d37171;
   border-color: #bb0606;
   color: #5c1a1a;
 }
 
-// Fan module
-.fan-module label {
+// Fan Speed module
+.fan-speed label {
   background-color: #618fe6;
   border-color: rgb(2, 13, 170);
   color: #001629;
 }
 
 // Memory module
-.memory-module label {
+.memory label {
   background-color: #4db456;
   border-color: #14c523;
   color: #0d4d15;
 }
 
 // Volume module
-.volume-module label {
+.volume label {
   background-color: #79a0e8;
   border-color: #1e65c2;
   color: #0f2a5a;
 }
 
 // Power module
-.power-module {
-  .power-button {
+.power {
+  .power-btn {
     background-color: #f77676;
     color: #181825;
     border-radius: 5rem;
@@ -149,57 +159,6 @@ window {
     
     &:hover {
       background-color: #ff5555;
-    }
-  }
-}
-
-// Power dropdown menu
-.power-menu {
-  background-color: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
-  border-radius: 12px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-  padding: 15px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  
-  .power-option {
-    display: flex;
-    align-items: center;
-    padding: 8px 12px;
-    margin: 4px 0;
-    border-radius: 8px;
-    transition: all 0.3s ease;
-    font-size: 16px;
-    color: #333;
-    
-    &:hover {
-      background: linear-gradient(135deg, #667eea, #764ba2);
-      color: white;
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-    }
-    
-    &:active {
-      transform: scale(0.98);
-    }
-    
-    .power-icon {
-      font-size: 18px;
-      margin-right: 8px;
-      width: 20px;
-      text-align: center;
-    }
-    
-    &.logout {
-      border-left: 4px solid #ff9500;
-    }
-    
-    &.restart {
-      border-left: 4px solid #007aff;
-    }
-    
-    &.shutdown {
-      border-left: 4px solid #ff3b30;
     }
   }
 } 

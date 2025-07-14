@@ -1,13 +1,103 @@
-;; Minimal test widget
-(defwidget test []
-  (box :class "test-box"
-    (label :text "TEST BAR")))
+;; Main bar widget with left, center, right sections
+(defwidget bar []
+  (box :class "bar"
+       :orientation "horizontal"
+    (box :class "modules-left"
+         :halign "start"
+         :space-evenly false
+      (workspaces))
+    (box :class "modules-center"
+         :halign "center"
+         :space-evenly false
+      (clock))
+    (box :class "modules-right"
+         :halign "end"
+         :space-evenly false
+      (cpu-usage)
+      (cpu-temp)
+      (fan-speed)
+      (memory)
+      (volume)
+      (power))))
 
-;; Test window with proper Wayland layer surface properties
+;; Workspace listener for real-time updates
+(deflisten workspaces-data :initial "[]" "/home/war/Arch/Hyprland/eww/scripts/workspaces-listen")
+
+;; Workspaces widget with clickable dots
+(defwidget workspaces []
+  (box :class "workspaces"
+       :orientation "horizontal"
+       :space-evenly false
+    (for workspace in workspaces-data
+      (button :class "workspace ${workspace.active ? 'active' : ''}"
+              :onclick "hyprctl dispatch workspace ${workspace.id}"
+        (label :text "${workspace.icon}")))))
+
+;; Clock widget showing current time
+(defwidget clock []
+  (box :class "clock"
+    (label :text "${formattime(EWW_TIME, '%H:%M')}")))
+
+;; CPU usage widget with real-time updates
+(defwidget cpu-usage []
+  (box :class "cpu-usage module-group"
+       :orientation "horizontal"
+       :space-evenly false
+    (label :class "cpu-icon" :text "")
+    (label :class "cpu-value" :text "${round(EWW_CPU.avg, 0)}%")))
+
+;; CPU temperature widget with script updates
+(defpoll cpu-temp-data :interval "1s" :initial "N/A" "/home/war/Arch/Hyprland/eww/scripts/cpu-temp")
+
+(defwidget cpu-temp []
+  (box :class "cpu-temp module-group"
+       :orientation "horizontal"
+       :space-evenly false
+    (label :class "cpu-temp-icon" :text "")
+    (label :class "cpu-temp-value" :text "${cpu-temp-data}°C")))
+
+;; Fan speed widget with script updates
+(defpoll fan-speed-data :interval "1s" :initial "0" "/home/war/Arch/Hyprland/eww/scripts/fan-speed")
+
+(defwidget fan-speed []
+  (box :class "fan-speed module-group"
+       :orientation "horizontal"
+       :space-evenly false
+    (label :class "fan-icon" :text "󰈐")
+    (label :class "fan-value" :text "${fan-speed-data}%")))
+
+;; Memory widget with script updates
+(defpoll memory-data :interval "1s" :initial "0.0" "/home/war/Arch/Hyprland/eww/scripts/memory-used")
+
+(defwidget memory []
+  (box :class "memory module-group"
+       :orientation "horizontal"
+       :space-evenly false
+    (label :class "memory-icon" :text "")
+    (label :class "memory-value" :text "${memory-data}GB")))
+
+;; Volume widget with script updates
+(defpoll volume-data :interval "1s" :initial "0" "/home/war/Arch/Hyprland/eww/scripts/volume-level")
+
+(defwidget volume []
+  (box :class "volume module-group"
+       :orientation "horizontal"
+       :space-evenly false
+    (label :class "volume-icon" :text "󰕾")
+    (label :class "volume-value" :text "${volume-data}%")))
+
+;; Power widget with clickable button
+(defwidget power []
+  (box :class "power module-group"
+    (button :class "power-btn"
+            :onclick "/home/war/Arch/Hyprland/bin/power-btn"
+      (label :text "⏻"))))
+
+;; Main window with proper Wayland layer surface properties
 (defwindow bar
   :monitor 0
   :exclusive true
-  :namespace "eww_test"
+  :namespace "eww_bar"
   :layer "top"
   :geometry (geometry :x "0%"
                       :y "0%"
@@ -15,4 +105,4 @@
                       :height "30px"
                       :anchor "top center")
   :focusable false
-  (test)) 
+  (bar)) 

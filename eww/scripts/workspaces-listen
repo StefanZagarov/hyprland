@@ -15,15 +15,23 @@ get_workspaces() {
         local is_active="false"
         local icon="○"
         
+        # Check if workspace is active
         if [ "$active_ws" = "$i" ]; then
             is_active="true"
             icon="●"
-        elif [ "$has_windows" != "0" ] && [ "$has_windows" != "null" ]; then
+        # Check if workspace exists and has windows
+        elif [ -n "$has_windows" ] && [ "$has_windows" != "0" ] && [ "$has_windows" != "null" ]; then
             icon="●"
         fi
         
+        # Determine if workspace is empty (doesn't exist or has 0 windows)
+        local is_empty="true"
+        if [ -n "$has_windows" ] && [ "$has_windows" != "0" ] && [ "$has_windows" != "null" ]; then
+            is_empty="false"
+        fi
+        
         printf '{"id":%d,"active":%s,"empty":%s,"icon":"%s"}' \
-            "$i" "$is_active" "$([ "$has_windows" = "0" ] && echo "true" || echo "false")" "$icon"
+            "$i" "$is_active" "$is_empty" "$icon"
         
         [ $i -lt 10 ] && printf ','
     done
