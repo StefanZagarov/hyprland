@@ -1,0 +1,205 @@
+// Reset all styles
+* {
+  all: unset;
+  font-family: "JetBrainsMono Nerd Font Mono", monospace;
+  font-size: 14px;
+  padding: 0;
+  margin: 0;
+  border: none;
+  outline: none;
+  border-radius: 0;
+  box-shadow: none;
+  background-image: none;
+}
+
+// Main bar window
+.bar {
+  background-color: transparent; // Fully transparent like waybar
+  color: white;
+  padding: 0.3rem 1rem;
+}
+
+// Make the entire window transparent
+window {
+  background-color: transparent;
+}
+
+// Left side - Workspaces
+.workspaces {
+  background-color: rgba(84, 84, 84, 0.5);
+  border-radius: 5rem;
+  padding: 0 5px;
+  
+  .workspace {
+    padding: 0 5px;
+    color: rgb(20, 20, 20);
+    border-radius: 5rem;
+    
+    &:hover {
+      background-color: rgb(90, 90, 90);
+    }
+    
+    &.active {
+      color: rgb(255, 121, 37);
+      animation: ripple-glow 1.5s ease-out forwards;
+    }
+  }
+}
+
+@keyframes ripple-glow {
+  0% {
+    color: rgb(255, 200, 100);
+    text-shadow: 0 0 0 rgba(255, 170, 60, 1);
+  }
+  50% {
+    color: rgb(255, 150, 50);
+    text-shadow: 0 0 20px rgba(255, 170, 60, 1),
+                 0 0 40px rgba(255, 170, 60, 1),
+                 0 0 70px rgba(255, 170, 60, 1),
+                 0 0 100px rgba(255, 170, 60, 1),
+                 0 0 130px rgba(255, 170, 60, 1),
+                 0 0 160px rgba(255, 170, 60, 1);
+  }
+  100% {
+    color: rgb(255, 121, 37);
+    text-shadow: 0 0 0 rgba(255, 121, 37, 0);
+  }
+}
+
+// Center - Clock
+.clock {
+  color: #ffffff;
+}
+
+// Right side - System modules
+.sidestuff {
+  margin-right: 1rem;
+  
+  .module {
+    margin-right: 0.5rem;
+    
+    &:last-child {
+      margin-right: 0;
+    }
+    
+    // Style for modules with icon + value pairs
+    label:first-child {
+      border-width: 2px;
+      border-right: none;
+      border-radius: 5rem 0 0 5rem;
+      padding: 0 0.2rem 0 0.5rem;
+      margin-right: 0;
+      border-style: solid;
+    }
+    
+    label:last-child {
+      border-width: 2px;
+      border-left: none;
+      border-radius: 0 5rem 5rem 0;
+      padding: 0 0.5rem 0 0.2rem;
+      margin-right: 0;
+      border-style: solid;
+    }
+  }
+}
+
+// CPU module
+.cpu-module label {
+  background-color: #A886E9;
+  border-color: #6311fc;
+  color: #2d1b69;
+}
+
+// Temperature module
+.temp-module label {
+  background-color: #d37171;
+  border-color: #bb0606;
+  color: #5c1a1a;
+}
+
+// Fan module
+.fan-module label {
+  background-color: #618fe6;
+  border-color: rgb(2, 13, 170);
+  color: #001629;
+}
+
+// Memory module
+.memory-module label {
+  background-color: #4db456;
+  border-color: #14c523;
+  color: #0d4d15;
+}
+
+// Volume module
+.volume-module label {
+  background-color: #79a0e8;
+  border-color: #1e65c2;
+  color: #0f2a5a;
+}
+
+// Power module
+.power-module {
+  .power-button {
+    background-color: #f77676;
+    color: #181825;
+    border-radius: 5rem;
+    padding: 0 0.5rem;
+    margin-left: 0.5rem;
+    
+    &:hover {
+      background-color: #ff5555;
+    }
+  }
+}
+
+// Power dropdown menu
+.power-menu {
+  background-color: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  padding: 15px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  
+  .power-option {
+    display: flex;
+    align-items: center;
+    padding: 8px 12px;
+    margin: 4px 0;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    font-size: 16px;
+    color: #333;
+    
+    &:hover {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+    
+    &:active {
+      transform: scale(0.98);
+    }
+    
+    .power-icon {
+      font-size: 18px;
+      margin-right: 8px;
+      width: 20px;
+      text-align: center;
+    }
+    
+    &.logout {
+      border-left: 4px solid #ff9500;
+    }
+    
+    &.restart {
+      border-left: 4px solid #007aff;
+    }
+    
+    &.shutdown {
+      border-left: 4px solid #ff3b30;
+    }
+  }
+} 

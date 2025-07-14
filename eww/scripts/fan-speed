@@ -1,0 +1,10 @@
+#!/bin/bash
+# Get CPU fan speed percentage (same logic as waybar)
+sensors | grep 'CPU Fan:' | awk '{ 
+    current=$3; 
+    min=335; 
+    max=1780; 
+    if (current < min) current=min; 
+    percentage=((current - min) / (max - min)) * 100; 
+    print int(percentage) 
+}' 

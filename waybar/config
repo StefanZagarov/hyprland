@@ -112,7 +112,7 @@
   "custom/power": {
     "format": "⏻",
     "tooltip": false,
-    "on-click": "wlogout",
+    "on-click": "~/Arch/Hyprland/bin/power-btn",
     "interval": 86400
   },
   "mode": "dock",

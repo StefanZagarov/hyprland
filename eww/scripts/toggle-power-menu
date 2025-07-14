@@ -1,0 +1,7 @@
+#!/bin/bash
+# Toggle power menu dropdown
+if eww windows | grep -q "power-menu"; then
+    eww close power-menu
+else
+    eww open power-menu
+fi 

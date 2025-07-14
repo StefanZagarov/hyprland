@@ -1,0 +1,12 @@
+#!/bin/bash
+# Simple workspaces script - return basic workspaces with proper UTF-8
+export LC_ALL=en_US.UTF-8
+export LANG=en_US.UTF-8
+
+printf '[
+  {"id":1,"active":true,"empty":false,"icon":"●"},
+  {"id":2,"active":false,"empty":true,"icon":"○"},
+  {"id":3,"active":false,"empty":true,"icon":"○"},
+  {"id":4,"active":false,"empty":true,"icon":"○"},
+  {"id":5,"active":false,"empty":true,"icon":"○"}
+]' 

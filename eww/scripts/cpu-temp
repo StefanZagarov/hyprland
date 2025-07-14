@@ -1,0 +1,8 @@
+#!/bin/bash
+# Get CPU temperature from hwmon5 (same as waybar config)
+if [ -f /sys/class/hwmon/hwmon5/temp1_input ]; then
+    temp=$(cat /sys/class/hwmon/hwmon5/temp1_input)
+    echo $((temp / 1000))
+else
+    echo "N/A"
+fi 

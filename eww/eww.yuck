@@ -1,0 +1,18 @@
+;; Minimal test widget
+(defwidget test []
+  (box :class "test-box"
+    (label :text "TEST BAR")))
+
+;; Test window with proper Wayland layer surface properties
+(defwindow bar
+  :monitor 0
+  :exclusive true
+  :namespace "eww_test"
+  :layer "top"
+  :geometry (geometry :x "0%"
+                      :y "0%"
+                      :width "100%"
+                      :height "30px"
+                      :anchor "top center")
+  :focusable false
+  (test)) 
