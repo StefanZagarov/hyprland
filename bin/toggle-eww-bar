@@ -1,0 +1,11 @@
+#!/bin/bash
+
+STATE_FILE="/tmp/eww-bar-state"
+
+if [ -f "$STATE_FILE" ] && [ "$(cat "$STATE_FILE")" = "closed" ]; then
+    eww -c ~/Arch/Hyprland/eww open bar
+    echo "open" > "$STATE_FILE"
+else
+    eww -c ~/Arch/Hyprland/eww close bar 2>/dev/null
+    echo "closed" > "$STATE_FILE"
+fi 
