@@ -14,14 +14,10 @@
 
 // Main bar window
 .bar {
-  background-color: transparent; // Fully transparent like waybar
+  // background-color: transparent; // Fully transparent like waybar
   color: white;
-  padding: 0.3rem 0;
-}
-
-// Make the entire window transparent
-window {
   background-color: transparent;
+  padding: 0.3rem 0;
 }
 
 // Layout sections
@@ -31,6 +27,9 @@ window {
 
 .modules-center {
   color: #ffffff;
+  background-color: rgba(80, 80, 80, 0.4);
+  border-radius: 5rem;
+  padding: 0 6px;
 }
 
 .modules-right {
@@ -47,7 +46,7 @@ window {
 
 // Left side - Workspaces
 .workspaces {
-  background-color: rgba(84, 84, 84, 0.5);
+  background-color: rgba(80, 80, 80, 0.4);
   border-radius: 5rem;
   padding: 0 5px;
   
@@ -57,7 +56,7 @@ window {
     border-radius: 5rem;
     
     &:hover {
-      background-color: rgb(90, 90, 90);
+      background-color: rgba(85, 85, 85, 0.4);
     }
     
     &.active {
@@ -89,7 +88,7 @@ window {
 
 // Center - Clock
 .clock {
-  color: #ffffff;
+  color: rgb(220, 220, 220);
 }
 
 // Common styling for all module groups
