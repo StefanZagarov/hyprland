@@ -153,4 +153,4 @@
                       :height "120px"
                       :anchor "top right")
   :focusable false
-  (power-dropdown)) 
+  (power-dropdown))
