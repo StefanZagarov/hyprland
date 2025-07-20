@@ -1,1 +1,51 @@
 /* Documentation: https://man.archlinux.org/man/swaync.5.en */
+
+/* Hide close buttons - they're redundant since clicking notifications closes them */
+.close-button {
+    opacity: 0;
+    min-width: 0px;
+    min-height: 0px;
+    margin: 0px;
+    padding: 0px;
+}
+
+.notification-group .notification-group-close-button .close-button {
+    opacity: 0;
+    min-width: 0px;
+    min-height: 0px;
+    margin: 0px;
+    padding: 0px;
+}
+
+/* Animated border notifications */
+.notification-row .notification-background .notification {
+    border: 2px solid #262fad;
+    transition: border-color 0.3s ease-in-out;
+}
+
+/* Hover effect - border color change */
+.notification-row .notification-background .notification:hover {
+    border-color: #3b43df;
+    background: rgba(var(--noti-bg), calc(var(--noti-bg-alpha) + 0.1));
+}
+
+/* Focus effect - different border color */
+.notification-row .notification-background .notification:focus {
+    border-color: #ff6b6b;
+}
+
+/* Timer notification borders - different colors for different urgency levels */
+.notification-row .notification-background .notification.normal {
+    /* Normal urgency - blue border (plenty of time left) */
+    border-color: #555aaa;
+}
+
+.notification-row .notification-background .notification.low {
+    /* Low urgency - yellow border (time running low) */
+    border-color: #ffa726;
+}
+
+/* Critical notifications - bright red border (urgent) */
+.notification-row .notification-background .notification.critical {
+    border-color: #ff4757;
+}
