@@ -222,11 +222,6 @@
 
 .bindings {
   // for the scroll widget
-  color: #ff1010;
-}
-
-.inner-box {
-  padding: 0 16px;
 }
 
 .entry {
@@ -251,4 +246,12 @@
 
 .desc {
   color: #a6e3a1;
+}
+
+.group-title {
+  font-size: 24px;
+  font-weight: bold;
+  color: #f5c2e7;
+  margin-top: 20px;
+  margin-bottom: 10px;
 }
