@@ -16,6 +16,6 @@
     (scroll :vscroll true :class "bindings" :vexpand true
       (box :orientation "vertical" :halign "fill" :class "inner-box"
         (for entry in keybinds-lines
-          (box :orientation "horizontal" :class "entry"
+          (box :orientation "horizontal" :class "entry" :space-evenly false
             (label :text "${entry.key}" :class "key" :halign "start")
             (label :text "${entry.desc}" :class "desc" :halign "start")))))))
