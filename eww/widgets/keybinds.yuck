@@ -9,20 +9,17 @@
   :exclusive false
   :visible keybinds-visible
   (keybinds))
-  
 
 (defwidget keybinds []
   (box :orientation "vertical" :class "overlay" :space-evenly false
     (label :text "Hyprland Keybinds" :class "title" :halign "center")
     (scroll :vscroll true :class "bindings" :vexpand true
-     (box :orientation "vertical" :halign "fill" :class "inner-box"
-  (for item in keybinds-items
-    (box :orientation "vertical"
-      ;; group title
-      (label :text "${item.text}" :class "group-title"
-             :visible "${item.is_title}")
-      ;; keybind row
-      (box :orientation "horizontal" :class "entry" :space-evenly false
-           :visible "${item.key}"          ; rows have .key, titles don’t
-        (label :text "${item.key}"  :class "key"   :halign "start")
-        (label :text "${item.desc}" :class "desc"  :halign "start"))))))))
+      (box :orientation "vertical" :halign "fill" :class "inner-box"
+        (for group in keybinds-items
+          (box :orientation "vertical"
+            (label :text "${group.group}" :class "group-title")
+            (for bind in "${group.items}"
+              (box :orientation "horizontal" :class "entry" :space-evenly false
+                (label :text "${bind.key}"  :class "key"   :halign "start")
+                (label :text "${bind.desc}" :class "desc"  :halign "start")
+              ))))))))
