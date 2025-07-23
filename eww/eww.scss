@@ -202,56 +202,79 @@
   }
 }
 
-// Keybinds overlay
+// Keybinds cheatsheet
+/*
+ * A simple, safe, and modern CSS for the Eww Cheatsheet.
+ * This is compatible with GTK3 and avoids all complex properties.
+ */
+
+/* The main full-screen container */
 .overlay {
-  background-color: rgba(30, 30, 46, 0.9);
-  // padding: 32px;
-  // margin: 32px;
-  border-radius: 16px;
-  border: 1px solid rgba(202, 211, 245, 0.1);
-  color: #cad3f5;
-  font-family: "JetBrainsMono Nerd Font";
+    background-color: rgba(30, 30, 46, 0.95); /* Dark, semi-transparent background */
+    padding: 3rem; /* Spacing from the edges of the screen */
+    font-family: monospace;
 }
 
+/* "Hyprland Keybinds" Title */
 .title {
-  font-size: 40px;
-  font-weight: bold;
-  // margin-bottom: 24px;
-  color: #89b4fa;
+    color: #89b4fa; /* A bright, friendly blue */
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin-bottom: 2rem;
 }
 
-.bindings {
-  // for the scroll widget
+/* Spacing for each category (e.g., Windows, Apps) */
+.group-container {
+    margin-bottom: 2rem;
 }
 
-.entry {
-  // padding: 8px;
-  font-size: 18px;
-  color: #cad3f5;
-  transition: background-color 0.3s ease;
-  border-radius: 8px;
-
-  &:hover {
-    background-color: rgba(137, 180, 250, 0.15);
-    color: #fff;
-  }
-}
-
-.key {
-  font-weight: bold;
-  color: #cba6f7;
-  min-width: 250px;
-  // margin-right: 32px;
-}
-
-.desc {
-  color: #a6e3a1;
-}
-
+/* Category titles */
 .group-title {
-  font-size: 24px;
-  font-weight: bold;
-  color: #f5c2e7;
-  // margin-top: 20px;
-  // margin-bottom: 10px;
+    color: #cba6f7; /* A pleasant lavender */
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+}
+
+/* A single keybind row */
+.entry {
+    margin-bottom: 0.75rem;
+}
+
+/* The key itself (e.g., "SUPER + Q") */
+.key {
+    color: #1e1e2e; /* Dark text for contrast */
+    background-color: #d4aa72; /* A soft, standout green */
+    font-size: 1rem;
+    font-weight: bold;
+    border-radius: 6px;
+    padding: 0.4rem 0.8rem;
+    margin-right: 1.5rem; /* Space between the key and its description */
+
+    /* This is important for alignment. Adjust if your keys are very long. */
+    min-width: 200px;
+}
+
+/* The description of the keybind */
+.desc {
+    color: #cad3f5; /* Easy-to-read light text */
+    font-size: 1rem;
+    /* Vertically align the text with the center of the key block */
+    padding-top: 0.4rem;
+}
+
+/* --- Minimalist Scrollbar --- */
+.bindings {
+    /* This makes the scrollbar track transparent */
+    background-color: transparent;
+}
+
+.bindings scrollbar {
+    border: none;
+    min-width: 10px; /* Width of the scrollbar */
+}
+
+.bindings slider {
+    background-color: #585b70; /* Color of the scrollbar handle */
+    border-radius: 5px;
 }

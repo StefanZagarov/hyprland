@@ -14,12 +14,21 @@
   (box :orientation "vertical" :class "overlay" :space-evenly false
     (label :text "Hyprland Keybinds" :class "title" :halign "center")
     (scroll :vscroll true :class "bindings" :vexpand true
-      (box :orientation "vertical" :halign "fill" :class "inner-box"
+      (box :orientation "vertical" :halign "fill" :class "inner-box" :space-evenly false
         (for group in keybinds-items
-          (box :orientation "vertical"
+          (box :orientation "vertical" :class "group-container" :space-evenly false
             (label :text "${group.group}" :class "group-title")
-            (for bind in "${group.items}"
-              (box :orientation "horizontal" :class "entry" :space-evenly false
-                (label :text "${bind.key}"  :class "key"   :halign "start")
-                (label :text "${bind.desc}" :class "desc"  :halign "start")
-              ))))))))
+            (box :orientation "vertical" :class "group-items"
+              (for bind in "${group.items}"
+                (box :orientation "horizontal" :class "entry" :space-evenly false
+                  (label :text "${bind.key}"  :class "key"   :halign "start")
+                  (label :text "${bind.desc}" :class "desc"  :halign "start")
+                )
+              )
+            )
+          )
+        )
+      )
+    )
+  )
+)
