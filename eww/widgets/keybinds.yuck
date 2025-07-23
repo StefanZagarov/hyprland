@@ -10,24 +10,42 @@
   :visible keybinds-visible
   (keybinds))
 
+(defwidget group-container [group]
+  (box :orientation "vertical" :class "group-container" :space-evenly false
+    (label :text "${group.group}" :class "group-title")
+    (box :orientation "vertical" :class "group-items"
+      (for bind in "${group.items}"
+        (box :orientation "horizontal" :class "entry" :space-evenly false
+          (label :text "${bind.key}"  :class "key"   :halign "start")
+          (label :text "${bind.desc}" :class "desc"  :halign "start")
+        )
+      )
+    )
+  )
+)
+
 (defwidget keybinds []
   (box :orientation "vertical" :class "overlay" :space-evenly false
     (label :text "Hyprland Keybinds" :class "title" :halign "center")
     (scroll :vscroll true :class "bindings" :vexpand true
-      (box :orientation "vertical" :halign "fill" :class "inner-box" :space-evenly false
-        (for group in keybinds-items
-          (box :orientation "vertical" :class "group-container" :space-evenly false
-            (label :text "${group.group}" :class "group-title")
-            (box :orientation "vertical" :class "group-items"
-              (for bind in "${group.items}"
-                (box :orientation "horizontal" :class "entry" :space-evenly false
-                  (label :text "${bind.key}"  :class "key"   :halign "start")
-                  (label :text "${bind.desc}" :class "desc"  :halign "start")
-                )
-              )
-            )
-          )
+      (box :orientation "vertical" :class "grid-container" :space-evenly false
+        ; First row
+        (box :orientation "horizontal" :class "row" :space-evenly false :halign "start"
+          (group-container :group "${keybinds-items[0]}")
+          (group-container :group "${keybinds-items[1]}")
+          (group-container :group "${keybinds-items[2]}")
+          (group-container :group "${keybinds-items[3]}")
+          (group-container :group "${keybinds-items[4]}")
         )
+        ; Second row
+        (box :orientation "horizontal" :class "row" :space-evenly false :halign "start"
+          (group-container :group "${keybinds-items[5]}")
+          (group-container :group "${keybinds-items[6]}")
+          (group-container :group "${keybinds-items[7]}")
+          (group-container :group "${keybinds-items[8]}")
+          (group-container :group "${keybinds-items[9]}")
+        )
+        ; Add more rows as needed
       )
     )
   )

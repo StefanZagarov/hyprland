@@ -203,11 +203,6 @@
 }
 
 // Keybinds cheatsheet
-/*
- * A simple, safe, and modern CSS for the Eww Cheatsheet.
- * This is compatible with GTK3 and avoids all complex properties.
- */
-
 /* The main full-screen container */
 .overlay {
     background-color: rgba(30, 30, 46, 0.95); /* Dark, semi-transparent background */
@@ -249,10 +244,10 @@
     font-weight: bold;
     border-radius: 6px;
     padding: 0.4rem 0.8rem;
-    margin-right: 1.5rem; /* Space between the key and its description */
+    margin-right: 1rem; /* Space between the key and its description */
 
     /* This is important for alignment. Adjust if your keys are very long. */
-    min-width: 200px;
+    min-width: 100px;
 }
 
 /* The description of the keybind */
@@ -277,4 +272,41 @@
 .bindings slider {
     background-color: #585b70; /* Color of the scrollbar handle */
     border-radius: 5px;
+}
+
+.row {
+    margin-bottom: 20px;
+}
+
+.group-container {
+    min-width: 250px;
+    background: rgba(30, 30, 46, 0.8);
+    border-radius: 12px;
+    padding: 15px;
+    // flex: 1;
+}
+
+.group-container[visible="false"] {
+    // opacity: 0;
+    // height: 0;
+    // width: 0;
+    // padding: 0;
+    // margin: 0;
+}
+
+.group-container[group=""] {
+    // opacity: 0;
+    // height: 0;
+    // width: 0;
+    // padding: 0;
+    // margin: 0;
+    // border: none;
+}
+
+.group-title {
+    font-size: 1.3em;
+    font-weight: bold;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #45475a;
 }
