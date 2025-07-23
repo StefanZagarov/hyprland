@@ -1,0 +1,21 @@
+(defvar keybinds-lines "[]")
+
+(defwindow keybinds_overlay
+  :monitor 0
+  :geometry (geometry :x "0" :y "0" :width "100%" :height "100%")
+  :stacking "fg"
+  :focusable false
+  :anchor "top left"
+  :exclusive false
+  :visible keybinds-visible
+  (keybinds))
+
+(defwidget keybinds []
+  (box :orientation "vertical" :class "overlay" :space-evenly false
+    (label :text "Hyprland Keybinds" :class "title" :halign "center")
+    (scroll :vscroll true :class "bindings" :vexpand true
+      (box :orientation "vertical" :halign "fill" :class "inner-box"
+        (for entry in keybinds-lines
+          (box :orientation "horizontal" :class "entry"
+            (label :text "${entry.key}" :class "key" :halign "start")
+            (label :text "${entry.desc}" :class "desc" :halign "start")))))))

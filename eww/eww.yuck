@@ -154,3 +154,6 @@
                       :anchor "top right")
   :focusable false
   (power-dropdown))
+
+;; Cheatsheet widget
+(include "widgets/keybinds.yuck")
