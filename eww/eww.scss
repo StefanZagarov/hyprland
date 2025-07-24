@@ -202,33 +202,41 @@
   }
 }
 
+
 // Keybinds cheatsheet
 /* The main full-screen container */
 .overlay {
-    background-color: rgba(30, 30, 46, 0.95); /* Dark, semi-transparent background */
-    padding: 3rem; /* Spacing from the edges of the screen */
+    background-color: rgba(0, 0, 0, 0.2);
+    padding: 3rem;
     font-family: monospace;
 }
 
 /* "Hyprland Keybinds" Title */
 .title {
-    color: #89b4fa; /* A bright, friendly blue */
+    color: #A0A8B0;
     font-size: 2.5rem;
     font-weight: bold;
     margin-bottom: 2rem;
 }
 
-/* Spacing for each category (e.g., Windows, Apps) */
+/* Category container */
 .group-container {
+    min-width: 440px;
+    background: rgba(70, 70, 70, 0.7);
+    border-radius: 12px;
+    padding: 15px;
+    margin-right: 30px;
     margin-bottom: 2rem;
 }
 
 /* Category titles */
 .group-title {
-    color: #cba6f7; /* A pleasant lavender */
+    color: #84a4e9;
     font-size: 1.5rem;
     font-weight: bold;
     margin-bottom: 1rem;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #111111;
 }
 
 /* A single keybind row */
@@ -238,24 +246,20 @@
 
 /* The key itself (e.g., "SUPER + Q") */
 .key {
-    color: #1e1e2e; /* Dark text for contrast */
-    background-color: #d4aa72; /* A soft, standout green */
-    font-size: 1rem;
+    color: #d4aa72;
+    font-size: 1.2rem;
     font-weight: bold;
-    border-radius: 6px;
     padding: 0.4rem 0.8rem;
-    margin-right: 1rem; /* Space between the key and its description */
+    margin-right: 1rem;
 
     /* This is important for alignment. Adjust if your keys are very long. */
-    min-width: 100px;
+    min-width: 110px;
 }
 
 /* The description of the keybind */
 .desc {
-    color: #cad3f5; /* Easy-to-read light text */
-    font-size: 1rem;
-    /* Vertically align the text with the center of the key block */
-    padding-top: 0.4rem;
+    color: #cad3f5;
+    font-size: 1.1rem;
 }
 
 /* --- Minimalist Scrollbar --- */
@@ -266,47 +270,14 @@
 
 .bindings scrollbar {
     border: none;
-    min-width: 10px; /* Width of the scrollbar */
+    min-width: 10px;
 }
 
 .bindings slider {
-    background-color: #585b70; /* Color of the scrollbar handle */
+    background-color: #444450; 
     border-radius: 5px;
 }
 
 .row {
     margin-bottom: 20px;
-}
-
-.group-container {
-    min-width: 250px;
-    background: rgba(30, 30, 46, 0.8);
-    border-radius: 12px;
-    padding: 15px;
-    // flex: 1;
-}
-
-.group-container[visible="false"] {
-    // opacity: 0;
-    // height: 0;
-    // width: 0;
-    // padding: 0;
-    // margin: 0;
-}
-
-.group-container[group=""] {
-    // opacity: 0;
-    // height: 0;
-    // width: 0;
-    // padding: 0;
-    // margin: 0;
-    // border: none;
-}
-
-.group-title {
-    font-size: 1.3em;
-    font-weight: bold;
-    margin-bottom: 12px;
-    padding-bottom: 8px;
-    border-bottom: 2px solid #45475a;
 }
