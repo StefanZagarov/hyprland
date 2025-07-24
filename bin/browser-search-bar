@@ -1,0 +1,49 @@
+#!/bin/bash
+
+# Configuration
+HISTORY_FILE="$HOME/.cache/rofi_search_history"
+MAX_HISTORY=50
+browser="${BROWSER:-firefox}"
+
+# Ensure history file exists
+mkdir -p "${HISTORY_FILE%/*}" && touch "$HISTORY_FILE"
+
+# Read and display history (newest first)
+history=$(tac "$HISTORY_FILE" 2>/dev/null)
+
+# Get user query with deletion support
+query=$(printf '%s\n' "$history" | \
+        rofi -dmenu -p "Search Web" \
+             -theme-str "entry { placeholder: \"Search with ${browser}...\"; }" \
+             -kb-remove-char-forward "!Ctrl+d" \
+             -kb-custom-1 "Ctrl+d")
+
+rofi_exit_code=$?
+
+# Handle Ctrl+d deletion
+if [ "$rofi_exit_code" -eq 10 ]; then
+    if [ -n "$query" ]; then
+        # Efficient deletion using temp file
+        grep -vFx "$query" "$HISTORY_FILE" > "$HISTORY_FILE.tmp" &&
+        mv "$HISTORY_FILE.tmp" "$HISTORY_FILE"
+    fi
+    # Restart to show updated history
+    exec "$0"
+fi
+
+# Exit if empty query
+[ -z "$query" ] && exit
+
+# Update history efficiently
+{
+    # Remove existing matches
+    grep -vFx "$query" "$HISTORY_FILE" | 
+    # Keep only last MAX_HISTORY-1 entries
+    tail -n "$((MAX_HISTORY - 1))"
+    # Add new query
+    echo "$query"
+} > "$HISTORY_FILE.tmp" && mv "$HISTORY_FILE.tmp" "$HISTORY_FILE"
+
+# Open in browser with proper encoding
+encoded_query=$(python3 -c "import urllib.parse, sys; print(urllib.parse.quote(sys.argv[1]))" "$query")
+"$browser" "https://www.google.com/search?q=$encoded_query"

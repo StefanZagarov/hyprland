@@ -42,7 +42,7 @@
 
 .notification-row .notification-background .notification.low {
     /* Low urgency - yellow border (time running low) */
-    border-color: #ffa726;
+    border-color: #1ED760;
 }
 
 /* Critical notifications - bright red border (urgent) */
