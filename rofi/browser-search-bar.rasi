@@ -1,0 +1,33 @@
+* {
+    background-color: transparent;
+    margin: 0;
+    padding: 0;
+}
+
+window {
+    transparency: "real";
+    background-color: transparent;
+    border: 0;
+    width: 400px; /* Match Firefox's search bar width */
+}
+
+inputbar {
+    children: [entry];
+    background-color: transparent;
+    border: 0;
+}
+
+entry {
+    enabled: true;
+    background-color:#161925;
+    text-color: #C3C7D1;
+    border-radius: 4px;
+    border: 3px solid;
+    border-color:  #0C0E14;
+    font: "Fira Sans 12"; /* Match Firefox font */
+    padding: 1% 0.7%;
+}
+
+listview, element, prompt {
+    enabled: false; /* Hide everything except the search bar */
+}
