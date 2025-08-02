@@ -21,12 +21,14 @@
 .notification-row .notification-background .notification {
     border: 2px solid #262fad;
     transition: border-color 0.3s ease-in-out;
+    /* Solid dark background */
+    background: #2a2a2a;
 }
 
 /* Hover effect - border color change */
 .notification-row .notification-background .notification:hover {
     border-color: #3b43df;
-    background: rgba(var(--noti-bg), calc(var(--noti-bg-alpha) + 0.1));
+    background: #2a2a2a;
 }
 
 /* Focus effect - different border color */
