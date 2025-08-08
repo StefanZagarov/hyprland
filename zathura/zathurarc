@@ -1,0 +1,36 @@
+# === Appearance ===
+set font "monospace 12"
+set guioptions none              # hide the statusbar and toolbar
+set statusbar-h-padding 0
+set statusbar-v-padding 0
+set window-title-basename true   # show only filename in title
+
+# === Theme === (Dark mode)
+### UI appearance
+set default-bg "#000000"              # Dark navy blue background
+set default-fg "#e0e0e0"              # Light gray text
+### Recoloring (inverts content)
+set recolor true
+set recolor-keephue true             # Invert colored elements if true
+### Force white to black, and black to white in images
+set recolor-darkcolor "#CCCCCC"      # Background color → replaces white areas in the PDF
+set recolor-lightcolor "#1A1A1A"     # Foreground color → used for text and image foregrounds (typically black ink)
+### Highlighting colors
+set highlight-color "#808080"         # For search matches
+set highlight-active-color "#F5C58C"  # For the current match
+
+# === Navigation ===
+set scroll-step 100              # number of pixels per scroll step
+set adjust-open "best-fit"       # fit to page width or height
+set pages-per-row 1              # single page view
+set zoom-step 10
+
+# === Performance ===
+set synctex true                 # SyncTeX support for LaTeX users
+set incremental-search true
+
+# === Behavior ===
+set selection-clipboard clipboard   # copy selected text to system clipboard
+set enable-spellchecking false
+set show-hidden false
+
