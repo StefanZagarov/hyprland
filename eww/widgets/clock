@@ -1,0 +1,5 @@
+;; Clock widget showing current time
+(defwidget clock []
+  (box :class "clock"
+  :tooltip "${formattime(EWW_TIME, '%a %d.%m.%y')}"
+    (label :text "${formattime(EWW_TIME, '%H:%M')}")))

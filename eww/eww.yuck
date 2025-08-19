@@ -1,3 +1,7 @@
+;; Widgets
+(include "widgets/clock")
+(include "widgets/keybinds.yuck")
+
 ;; Main bar widget with left, center, right sections
 (defwidget bar []
   (box :class "bar"
@@ -36,16 +40,15 @@
               :onclick "hyprctl dispatch workspace ${workspace.id}"
         (label :text "${workspace.icon}")))))
 
-;; Clock widget showing current time
-(defwidget clock []
-  (box :class "clock"
-    (label :text "${formattime(EWW_TIME, '%H:%M')}")))
+;; CPU per core usage script
+(defpoll cpu-cores :interval "1s" "~/Arch/Hyprland/eww/scripts/cpu-cores")
 
 ;; CPU usage widget with real-time updates
 (defwidget cpu-usage []
   (box :class "cpu-usage module-group"
        :orientation "horizontal"
        :space-evenly false
+       :tooltip "${cpu-cores}"
     (label :class "cpu-icon" :text "")
     (label :class "cpu-value" :text "${round(EWW_CPU.avg, 0)}%")))
 
@@ -154,6 +157,3 @@
                       :anchor "top right")
   :focusable false
   (power-dropdown))
-
-;; Cheatsheet widget
-(include "widgets/keybinds.yuck")

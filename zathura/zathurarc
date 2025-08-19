@@ -33,4 +33,3 @@ set incremental-search true
 set selection-clipboard clipboard   # copy selected text to system clipboard
 set enable-spellchecking false
 set show-hidden false
-

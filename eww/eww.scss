@@ -44,7 +44,7 @@
   }
 }
 
-// Left side - Workspaces
+// Left side modules - Workspaces
 .workspaces {
   background-color: rgba(80, 80, 80, 0.4);
   border-radius: 5rem;
@@ -108,6 +108,8 @@
   }
 }
 
+// Right side modules
+
 // CPU Usage module
 .cpu-usage label {
   background-color: #A886E9;
@@ -136,6 +138,13 @@
 .volume label {
   background-color: #79a0e8;
   color: #0a1d3f;
+}
+
+// Tooltips
+tooltip {
+  background-color: #181825;
+  border-radius: 8px;
+  padding: 10px;
 }
 
 // Power module

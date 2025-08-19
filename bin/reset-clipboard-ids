@@ -34,7 +34,7 @@ echo "$clipboard_list" | while IFS=$'\t' read -r id content; do
     echo -n "$id" | cliphist decode > "$BACKUP_DIR/$id" 2>/dev/null
 done
 
-# Stop cliphist store processes to ensure clean reset
+# Stop cliphist store processes to ensure clean reset - potentially bad line (It tries to kill watchers using an exact substring that doesn’t match the typed ones, then starts a generic watcher)
 pkill -f "wl-paste --watch cliphist store" 2>/dev/null
 
 # Delete the database to reset counter
@@ -51,7 +51,7 @@ echo "$clipboard_list" | tac | while IFS=$'\t' read -r id content; do
     fi
 done
 
-# Restart cliphist store processes
+# Restart cliphist store processes - potentially bad line (It tries to kill watchers using an exact substring that doesn’t match the typed ones, then starts a generic watcher)
 nohup wl-paste --watch cliphist store >/dev/null 2>&1 &
 
 # Clean up backup
