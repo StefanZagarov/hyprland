@@ -38,6 +38,9 @@ open = [
 image = [
     { run = 'feh --scale-down --auto-zoom --image-bg black "$@"', desc = "View with feh" }
 ]
+video = [
+  { run = 'vlc "$@"', desc = "Open with VLC", orphan = true }
+]
 reveal = [
 	{ run = 'xdg-open "$(dirname "$1")"', desc = "Reveal", for = "linux" },
 	{ run = '''clear; exiftool "$1"; echo "Press enter to exit"; read _''', block = true, desc = "Show EXIF", for = "unix" },

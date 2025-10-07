@@ -1,4 +1,4 @@
 #!/bin/bash
-# eww wrapper script - always uses repo config
+# eww wrapper script - always uses repo config - research this, possibly redundant
 SCRIPT_DIR="$(dirname "$(realpath "$0")")"
 exec eww -c "$SCRIPT_DIR" "$@" 
