@@ -8,5 +8,10 @@ printf '[
   {"id":2,"active":false,"empty":true,"icon":"○"},
   {"id":3,"active":false,"empty":true,"icon":"○"},
   {"id":4,"active":false,"empty":true,"icon":"○"},
-  {"id":5,"active":false,"empty":true,"icon":"○"}
+  {"id":5,"active":false,"empty":true,"icon":"○"},
+  {"id":6,"active":false,"empty":true,"icon":"○"},
+  {"id":7,"active":false,"empty":true,"icon":"○"},
+  {"id":8,"active":false,"empty":true,"icon":"○"},
+  {"id":9,"active":false,"empty":true,"icon":"○"},
+  {"id":10,"active":false,"empty":true,"icon":"○"},
 ]' 

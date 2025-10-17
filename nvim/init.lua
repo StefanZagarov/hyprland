@@ -588,7 +588,6 @@ require("lazy").setup({
 			vim.keymap.set("n", "]d", vim.diagnostic.goto_next, { desc = "Go to next diagnostic" })
 			vim.keymap.set("n", "<leader>e", vim.diagnostic.open_float, { desc = "Show diagnostic message" })
 
-
 			-- LSP servers and clients are able to communicate to each other what features they support.
 			--  By default, Neovim doesn't support everything that is in the LSP specification.
 			--  When you add blink.cmp, luasnip, etc. Neovim now has *more* capabilities.
@@ -604,75 +603,75 @@ require("lazy").setup({
 			--  - capabilities (table): Override fields in capabilities. Can be used to disable certain LSP features.
 			--  - settings (table): Override the default settings passed when initializing the server.
 			--        For example, to see the options for `lua_ls`, you could go to: https://luals.github.io/wiki/settings/
-local servers = {
-	-- clangd = {},
-	-- gopls = {},
-	-- pyright = {},
-	-- rust_analyzer = {},
-	-- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
-	--
-	-- Some languages (like typescript) have entire language plugins that can be useful:
-	--    https://github.com/pmizio/typescript-tools.nvim
-	--
-	-- But for many setups, the LSP (`ts_ls`) will work just fine
-	-- ts_ls = {},
-	--
 
-	lua_ls = {
-		-- cmd = { ... },
-		-- filetypes = { ... },
-		-- capabilities = {},
-		settings = {
-			Lua = {
-				completion = {
-					callSnippet = "Replace",
-				},
-				-- You can toggle below to ignore Lua_LS's noisy `missing-fields` warnings
-				-- diagnostics = { disable = { 'missing-fields' } },
-			},
-		},
-	},
+			local servers = {
+				-- clangd = {},
+				-- gopls = {},
+				-- pyright = {},
+				-- rust_analyzer = {},
+				-- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
+				--
+				-- Some languages (like typescript) have entire language plugins that can be useful:
+				--    https://github.com/pmizio/typescript-tools.nvim
+				--
+				-- But for many setups, the LSP (`ts_ls`) will work just fine
+				-- ts_ls = {},
+				--
 
-	-- vtsls
-	vtsls = {
-		filetypes = {
-			"javascript",
-			"javascriptreact",
-			"javascript.jsx",
-			"typescript",
-			"typescriptreact",
-			"typescript.tsx",
-			"vue",
-		},
-		-- Optional Vue plugin support
-		settings = {
-			vtsls = {
-				format = {enable = false},
-				tsserver = {
-					globalPlugins = {
-						{
-							name = '@vue/typescript-plugin',
-							location = vim.fn.stdpath('data')
-								.. "/mason/packages/vue-language-server/node_modules/@vue/language-server",
-							languages = { 'vue' },
-							configNamespace = 'typescript',
+				lua_ls = {
+					-- cmd = { ... },
+					-- filetypes = { ... },
+					-- capabilities = {},
+					settings = {
+						Lua = {
+							completion = {
+								callSnippet = "Replace",
+							},
+							-- You can toggle below to ignore Lua_LS's noisy `missing-fields` warnings
+							-- diagnostics = { disable = { 'missing-fields' } },
 						},
 					},
 				},
-			},
-		},
-	},
 
-	eslint = {
-  filetypes = { "javascript", "javascriptreact", "typescript", "typescriptreact", "vue" },
-  init_options = {
-    lintTask = true,
-    useESLintClass = true,
-    quiet = true,
-  }
-},
-}
+				-- vtsls
+				vtsls = {
+					filetypes = {
+						"javascript",
+						"javascriptreact",
+						"javascript.jsx",
+						"typescript",
+						"typescriptreact",
+						"typescript.tsx",
+						"vue",
+					},
+					-- Optional Vue plugin support
+					settings = {
+						vtsls = {
+							format = { enable = false },
+							tsserver = {
+								globalPlugins = {
+									{
+										name = "@vue/typescript-plugin",
+										location = vim.fn.stdpath("data")
+											.. "/mason/packages/vue-language-server/node_modules/@vue/language-server",
+										languages = { "vue" },
+										configNamespace = "typescript",
+									},
+								},
+							},
+						},
+					},
+				},
 
+				eslint = {
+					filetypes = { "javascript", "javascriptreact", "typescript", "typescriptreact", "vue" },
+					init_options = {
+						lintTask = true,
+						useESLintClass = true,
+						quiet = true,
+					},
+				},
+			}
 
 			-- Ensure the servers and tools above are installed
 			--
@@ -690,8 +689,8 @@ local servers = {
 			local ensure_installed = vim.tbl_keys(servers or {})
 			vim.list_extend(ensure_installed, {
 				"stylua", -- Used to format Lua code
-  "prettier",   -- JS/TS/HTML/CSS formatter
-  "eslint_d",   -- Fast ESLint daemon
+				"prettier", -- JS/TS/HTML/CSS formatter
+				"eslint_d", -- Fast ESLint daemon
 			})
 			require("mason-tool-installer").setup({ ensure_installed = ensure_installed })
 
@@ -744,13 +743,13 @@ local servers = {
 			end,
 			formatters_by_ft = {
 				lua = { "stylua" },
-				 javascript = {"prettierd", "prettier" },
-  typescript = { "prettierd", "prettier" },
-  javascriptreact = { "prettier" },
-  typescriptreact = { "prettier" },
-  json = { "prettier" },
-  html = { "prettier" },
-  css = { "prettier" },
+				javascript = { "prettierd", "prettier" },
+				typescript = { "prettierd", "prettier" },
+				javascriptreact = { "prettier" },
+				typescriptreact = { "prettier" },
+				json = { "prettier" },
+				html = { "prettier" },
+				css = { "prettier" },
 				-- Conform can also run multiple formatters sequentially
 				-- python = { "isort", "black" },
 				--
@@ -783,10 +782,10 @@ local servers = {
 					--    See the README about individual language/framework/plugin snippets:
 					--    https://github.com/rafamadriz/friendly-snippets
 					{
-					  'rafamadriz/friendly-snippets',
-					  config = function()
-					    require('luasnip.loaders.from_vscode').lazy_load()
-					  end,
+						"rafamadriz/friendly-snippets",
+						config = function()
+							require("luasnip.loaders.from_vscode").lazy_load()
+						end,
 					},
 				},
 				opts = {},
@@ -933,7 +932,22 @@ local servers = {
 		-- [[ Configure Treesitter ]] See `:help nvim-treesitter`
 		opts = {
 			ensure_installed = {
-	  "bash", "c", "diff", "html", "lua", "luadoc", "markdown", "markdown_inline", "query", "vim", "vimdoc", "javascript", "typescript", "tsx", "json", "css",
+				"bash",
+				"c",
+				"diff",
+				"html",
+				"lua",
+				"luadoc",
+				"markdown",
+				"markdown_inline",
+				"query",
+				"vim",
+				"vimdoc",
+				"javascript",
+				"typescript",
+				"tsx",
+				"json",
+				"css",
 			},
 			-- Autoinstall languages that are not installed
 			auto_install = true,
@@ -980,6 +994,7 @@ local servers = {
 	-- Or use telescope!
 	-- In normal mode type `<space>sh` then write `lazy.nvim-plugin`
 	-- you can continue same window with `<space>sr` which resumes last telescope search
+	{import = "custom.plugins"}
 }, {
 	ui = {
 		-- If you are using a Nerd Font: set icons to an empty table which will use the

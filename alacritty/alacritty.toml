@@ -2,7 +2,6 @@
 live_config_reload= true
 
 [window]
-padding = { x= 4, y= 4}
 opacity = 0.5
 blur= false
 startup_mode= "Windowed"
