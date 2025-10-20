@@ -19,7 +19,7 @@ vim.g.have_nerd_font = true
 -- Make line numbers default
 vim.o.number = true
 -- Add relative line numbers to help with jumping
-vim.o.relativenumber = false
+vim.o.relativenumber = true
 -- Show which line your cursor is on
 vim.o.cursorline = true
 
@@ -97,8 +97,8 @@ vim.keymap.set("n", "<leader>q", vim.diagnostic.setloclist, { desc = "Open diagn
 -- is not what someone will guess without a bit more experience.
 --
 -- NOTE: This won't work in all terminal emulators/tmux/etc. Try your own mapping
--- or just use <C-\><C-n> to exit terminal mode
-vim.keymap.set("t", "<Esc><Esc>", "<C-\\><C-n>", { desc = "Exit terminal mode" })
+-- or just use <C-\><C-n> to exit terminal mode (commented out because it's overlapped by the toggleterm plugin, which uses single escape key, which is more convenient)
+-- vim.keymap.set("t", "<Esc><Esc>", "<C-\\><C-n>", { desc = "Exit terminal mode" })
 
 -- TIP: Disable arrow keys in normal mode
 -- vim.keymap.set('n', '<left>', '<cmd>echo "Use h to move!!"<CR>')
@@ -261,7 +261,8 @@ require("lazy").setup({
 			-- Document existing key chains
 			spec = {
 				{ "<leader>s", group = "[S]earch" },
-				{ "<leader>t", group = "[T]oggle" },
+				{ "<leader>t", group = "[T]erminal" },
+				{ "<leader>T", group = "[T]oggle" },
 				{ "<leader>h", group = "Git [H]unk", mode = { "n", "v" } },
 			},
 		},
@@ -547,7 +548,7 @@ require("lazy").setup({
 						client
 						and client_supports_method(client, vim.lsp.protocol.Methods.textDocument_inlayHint, event.buf)
 					then
-						map("<leader>th", function()
+						map("<leader>Th", function()
 							vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled({ bufnr = event.buf }))
 						end, "[T]oggle Inlay [H]ints")
 					end
@@ -587,6 +588,11 @@ require("lazy").setup({
 			vim.keymap.set("n", "[d", vim.diagnostic.goto_prev, { desc = "Go to previous diagnostic" })
 			vim.keymap.set("n", "]d", vim.diagnostic.goto_next, { desc = "Go to next diagnostic" })
 			vim.keymap.set("n", "<leader>e", vim.diagnostic.open_float, { desc = "Show diagnostic message" })
+
+			-- Keymaps for Noice
+			-- In your keymaps section
+			vim.keymap.set("n", "<leader>nh", function() require("noice").cmd("history") end, { desc = "Noice History" })
+			vim.keymap.set("n", "<leader>nm", function() require("noice").cmd("last") end, { desc = "Noice Last Message" })
 
 			-- LSP servers and clients are able to communicate to each other what features they support.
 			--  By default, Neovim doesn't support everything that is in the LSP specification.
@@ -632,6 +638,11 @@ require("lazy").setup({
 						},
 					},
 				},
+
+				    jsonls = {}, -- JSON schema validation
+    				html = {},   -- HTML language server  
+    				cssls = {},  -- CSS language server
+					yamlls = {},   -- YAML language server
 
 				-- vtsls
 				vtsls = {
@@ -904,6 +915,16 @@ require("lazy").setup({
 			-- - saiw) - [S]urround [A]dd [I]nner [W]ord [)]Paren
 			-- - sd'   - [S]urround [D]elete [']quotes
 			-- - sr)'  - [S]urround [R]eplace [)] [']
+			local comment_opts = {}
+if pcall(require, "ts_context_commentstring.internal") then
+  comment_opts.options = {
+    custom_commentstring = function()
+      return require("ts_context_commentstring.internal").calculate_commentstring()
+        or vim.bo.commentstring
+    end,
+  }
+end
+require("mini.comment").setup(comment_opts)			
 			require("mini.surround").setup()
 
 			-- Simple and easy statusline.
@@ -948,6 +969,10 @@ require("lazy").setup({
 				"tsx",
 				"json",
 				"css",
+				"regex", -- required by Noice for search highlighting
+				"vue",
+				"scss",
+				"yaml",
 			},
 			-- Autoinstall languages that are not installed
 			auto_install = true,
@@ -979,22 +1004,19 @@ require("lazy").setup({
 	--
 	-- require 'kickstart.plugins.debug',
 	require("kickstart.plugins.indent_line"),
-	-- require 'kickstart.plugins.lint',
-	-- require 'kickstart.plugins.autopairs',
-	-- require 'kickstart.plugins.neo-tree',
-	-- require 'kickstart.plugins.gitsigns', -- adds gitsigns recommend keymaps
+	require 'kickstart.plugins.autopairs',
+	require 'kickstart.plugins.gitsigns', -- adds gitsigns recommend keymaps
 
 	-- NOTE: The import below can automatically add your own plugins, configuration, etc from `lua/custom/plugins/*.lua`
 	--    This is the easiest way to modularize your config.
 	--
 	--  Uncomment the following line and add your plugins to `lua/custom/plugins/*.lua` to get going.
-	-- { import = 'custom.plugins' },
+	{ import = 'custom.plugins' },
 	--
 	-- For additional information with loading, sourcing and examples see `:help lazy.nvim-🔌-plugin-spec`
 	-- Or use telescope!
 	-- In normal mode type `<space>sh` then write `lazy.nvim-plugin`
 	-- you can continue same window with `<space>sr` which resumes last telescope search
-	{import = "custom.plugins"}
 }, {
 	ui = {
 		-- If you are using a Nerd Font: set icons to an empty table which will use the
