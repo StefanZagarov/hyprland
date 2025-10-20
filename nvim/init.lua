@@ -329,7 +329,22 @@ require("lazy").setup({
 				--     i = { ['<c-enter>'] = 'to_fuzzy_refine' },
 				--   },
 				-- },
-				-- pickers = {}
+				pickers = {
+    buffers = {
+      -- Optional: hide current buffer, sort by MRU, etc.
+      sort_mru = true,
+      ignore_current_buffer = true,
+      -- 🔑 Enable <C-d> to delete buffer
+      mappings = {
+        i = {
+          ["<C-d>"] = require("telescope.actions").delete_buffer,
+        },
+        n = {
+          ["<C-d>"] = require("telescope.actions").delete_buffer,
+        },
+      },
+    },
+  },
 				extensions = {
 					["ui-select"] = {
 						require("telescope.themes").get_dropdown(),
