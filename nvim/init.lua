@@ -1,5 +1,12 @@
 -- ### Kickstart ###
 
+-- ## NeoVim global variables ##
+
+-- Indentation
+vim.opt.tabstop = 4
+vim.opt.shiftwidth = 4
+vim.opt.expandtab = true -- Use spaces instead of tabs
+
 -- Check line 227 for icons.keys = {} for nerd font icons
 
 -- Set <space> as the leader key
@@ -50,8 +57,10 @@ vim.o.smartcase = true
 -- Keep signcolumn on by default
 vim.o.signcolumn = "yes"
 
--- Decrease update time
-vim.o.updatetime = 250
+-- Keep messages visible longer
+vim.opt.updatetime = 250
+vim.opt.timeoutlen = 500
+-- vim.o.shortmess:append("F") -- prevent file messages from truncating
 
 -- Decrease mapped sequence wait time
 vim.o.timeoutlen = 300
@@ -201,6 +210,13 @@ require("lazy").setup({
 		},
 	},
 
+	-- Multicursor support
+	{
+    "mg979/vim-visual-multi",
+    branch = "master",
+    event = "VeryLazy",
+},
+
 	-- NOTE: Plugins can also be configured to run Lua code when they are loaded.
 	--
 	-- This is often very useful to both group configuration, as well as handle
@@ -330,21 +346,21 @@ require("lazy").setup({
 				--   },
 				-- },
 				pickers = {
-    buffers = {
-      -- Optional: hide current buffer, sort by MRU, etc.
-      sort_mru = true,
-      ignore_current_buffer = true,
-      -- 🔑 Enable <C-d> to delete buffer
-      mappings = {
-        i = {
-          ["<C-d>"] = require("telescope.actions").delete_buffer,
-        },
-        n = {
-          ["<C-d>"] = require("telescope.actions").delete_buffer,
-        },
-      },
-    },
-  },
+					buffers = {
+						-- Optional: hide current buffer, sort by MRU, etc.
+						sort_mru = true,
+						ignore_current_buffer = true,
+						-- 🔑 Enable <C-d> to delete buffer
+						mappings = {
+							i = {
+								["<C-d>"] = require("telescope.actions").delete_buffer,
+							},
+							n = {
+								["<C-d>"] = require("telescope.actions").delete_buffer,
+							},
+						},
+					},
+				},
 				extensions = {
 					["ui-select"] = {
 						require("telescope.themes").get_dropdown(),
@@ -567,6 +583,11 @@ require("lazy").setup({
 							vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled({ bufnr = event.buf }))
 						end, "[T]oggle Inlay [H]ints")
 					end
+
+					-- Enable semantic tokens for supported LSPs
+					if client and client:supports_method("textDocument/semanticTokens/full", { bufnr = event.buf }) then
+						vim.lsp.semantic_tokens.start(event.buf, client.id)
+					end
 				end,
 			})
 
@@ -606,8 +627,12 @@ require("lazy").setup({
 
 			-- Keymaps for Noice
 			-- In your keymaps section
-			vim.keymap.set("n", "<leader>nh", function() require("noice").cmd("history") end, { desc = "Noice History" })
-			vim.keymap.set("n", "<leader>nm", function() require("noice").cmd("last") end, { desc = "Noice Last Message" })
+			vim.keymap.set("n", "<leader>nh", function()
+				require("noice").cmd("history")
+			end, { desc = "Noice History" })
+			vim.keymap.set("n", "<leader>nm", function()
+				require("noice").cmd("last")
+			end, { desc = "Noice Last Message" })
 
 			-- LSP servers and clients are able to communicate to each other what features they support.
 			--  By default, Neovim doesn't support everything that is in the LSP specification.
@@ -654,10 +679,10 @@ require("lazy").setup({
 					},
 				},
 
-				    jsonls = {}, -- JSON schema validation
-    				html = {},   -- HTML language server  
-    				cssls = {},  -- CSS language server
-					yamlls = {},   -- YAML language server
+				jsonls = {}, -- JSON schema validation
+				html = {}, -- HTML language server
+				cssls = {}, -- CSS language server
+				yamlls = {}, -- YAML language server
 
 				-- vtsls
 				vtsls = {
@@ -672,6 +697,7 @@ require("lazy").setup({
 					},
 					-- Optional Vue plugin support
 					settings = {
+						semanticTokens = true,
 						vtsls = {
 							format = { enable = false },
 							tsserver = {
@@ -814,6 +840,29 @@ require("lazy").setup({
 						end,
 					},
 				},
+				config = function()
+					local luasnip = require("luasnip")
+					
+					-- Extend JavaScript snippets to React filetypes
+					luasnip.filetype_extend("javascriptreact", { "javascript" })
+					luasnip.filetype_extend("javascript.jsx", { "javascript" })
+					
+					-- Extend TypeScript snippets to React filetypes
+					luasnip.filetype_extend("typescriptreact", { "typescript", "javascript" })
+					luasnip.filetype_extend("typescript.tsx", { "typescript", "javascript" })
+					
+					-- Optional: Add HTML snippets to JSX/TSX files for JSX elements
+					luasnip.filetype_extend("javascriptreact", { "html" })
+					luasnip.filetype_extend("typescriptreact", { "html" })
+					
+					-- Setup LuaSnip with any additional options
+					luasnip.setup({
+						-- Enable autotriggered snippets
+						enable_autosnippets = true,
+						-- Use Tab (or your preferred key) to expand snippets
+						store_selection_keys = "<Tab>",
+					})
+				end,
 				opts = {},
 			},
 			"folke/lazydev.nvim",
@@ -924,22 +973,22 @@ require("lazy").setup({
 			--  - yinq - [Y]ank [I]nside [N]ext [Q]uote
 			--  - ci'  - [C]hange [I]nside [']quote
 			require("mini.ai").setup({ n_lines = 500 })
-
+			require("mini.map").setup()
 			-- Add/delete/replace surroundings (brackets, quotes, etc.)
 			--
 			-- - saiw) - [S]urround [A]dd [I]nner [W]ord [)]Paren
 			-- - sd'   - [S]urround [D]elete [']quotes
 			-- - sr)'  - [S]urround [R]eplace [)] [']
 			local comment_opts = {}
-if pcall(require, "ts_context_commentstring.internal") then
-  comment_opts.options = {
-    custom_commentstring = function()
-      return require("ts_context_commentstring.internal").calculate_commentstring()
-        or vim.bo.commentstring
-    end,
-  }
-end
-require("mini.comment").setup(comment_opts)			
+			if pcall(require, "ts_context_commentstring.internal") then
+				comment_opts.options = {
+					custom_commentstring = function()
+						return require("ts_context_commentstring.internal").calculate_commentstring()
+							or vim.bo.commentstring
+					end,
+				}
+			end
+			require("mini.comment").setup(comment_opts)
 			require("mini.surround").setup()
 
 			-- Simple and easy statusline.
@@ -1005,7 +1054,56 @@ require("mini.comment").setup(comment_opts)
 		--
 		--    - Incremental selection: Included, see `:help nvim-treesitter-incremental-selection-mod`
 		--    - Show your current context: https://github.com/nvim-treesitter/nvim-treesitter-context
+		-- { -- Show current function/class context above cursor (like VS Code breadcrumbs)
+		-- 	"nvim-treesitter/nvim-treesitter-context",
+		-- 	event = "VeryLazy",
+		-- 	opts = {
+		-- 		max_lines = 1,
+		-- 		multiline_threshold = 20,
+		-- 		separator = "-", -- or "─"
+		-- 		zindex = 20,
+		-- 	},
+		-- },
 		--    - Treesitter + textobjects: https://github.com/nvim-treesitter/nvim-treesitter-textobjects
+		{ -- Syntax-aware text objects (e.g. `af` = a function, `if` = inner function)
+			"nvim-treesitter/nvim-treesitter-textobjects",
+			event = "VeryLazy",
+			dependencies = { "nvim-treesitter/nvim-treesitter" },
+			config = function()
+				require("nvim-treesitter.configs").setup({
+					textobjects = {
+						select = {
+							enable = true,
+							lookahead = true, -- jump to textobj like targets.vim
+							keymaps = {
+								["af"] = "@function.outer",
+								["if"] = "@function.inner",
+								["ac"] = "@class.outer",
+								["ic"] = "@class.inner",
+								["aa"] = "@parameter.outer",
+								["ia"] = "@parameter.inner",
+							},
+							selection_modes = {
+								["@function.outer"] = "V", -- linewise
+								["@class.outer"] = "V",
+							},
+							include_surrounding_whitespace = true,
+						},
+						move = {
+							enable = true,
+							set_jumps = true,
+							goto_next_start = { ["]m"] = "@function.outer", ["]]"] = "@class.outer" },
+							goto_previous_start = { ["[m"] = "@function.outer", ["[["] = "@class.outer" },
+						},
+						swap = {
+							enable = true,
+							swap_next = { ["<leader>a"] = "@parameter.inner" },
+							swap_previous = { ["<leader>A"] = "@parameter.inner" },
+						},
+					},
+				})
+			end,
+		},
 	},
 
 	-- The following comments only work if you have downloaded the kickstart repo, not just copy pasted the
@@ -1019,14 +1117,14 @@ require("mini.comment").setup(comment_opts)
 	--
 	-- require 'kickstart.plugins.debug',
 	require("kickstart.plugins.indent_line"),
-	require 'kickstart.plugins.autopairs',
-	require 'kickstart.plugins.gitsigns', -- adds gitsigns recommend keymaps
+	require("kickstart.plugins.autopairs"),
+	require("kickstart.plugins.gitsigns"), -- adds gitsigns recommend keymaps
 
 	-- NOTE: The import below can automatically add your own plugins, configuration, etc from `lua/custom/plugins/*.lua`
 	--    This is the easiest way to modularize your config.
 	--
 	--  Uncomment the following line and add your plugins to `lua/custom/plugins/*.lua` to get going.
-	{ import = 'custom.plugins' },
+	{ import = "custom.plugins" },
 	--
 	-- For additional information with loading, sourcing and examples see `:help lazy.nvim-🔌-plugin-spec`
 	-- Or use telescope!
