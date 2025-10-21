@@ -1,40 +1,55 @@
 return {
   "SmiteshP/nvim-navic",
+  cond = true, -- true: enabled, false: disabled
   dependencies = { "neovim/nvim-lspconfig" },
-  event = "VeryLazy",
-  init = function()
-    -- Set global highlight groups early (optional but recommended)
-    -- vim.highlight.create("NavicIconsFile", { default = true, link = "Directory" })
-    -- vim.highlight.create("NavicIconsModule", { default = true, link = "Include" })
-    -- vim.highlight.create("NavicIconsNamespace", { default = true, link = "Include" })
-    -- vim.highlight.create("NavicIconsPackage", { default = true, link = "Include" })
-    -- vim.highlight.create("NavicIconsClass", { default = true, link = "Structure" })
-    -- vim.highlight.create("NavicIconsMethod", { default = true, link = "Function" })
-    -- vim.highlight.create("NavicIconsProperty", { default = true, link = "Identifier" })
-    -- vim.highlight.create("NavicIconsField", { default = true, link = "Identifier" })
-    -- vim.highlight.create("NavicIconsConstructor", { default = true, link = "Special" })
-    -- vim.highlight.create("NavicIconsEnum", { default = true, link = "Type" })
-    -- vim.highlight.create("NavicIconsInterface", { default = true, link = "Type" })
-    -- vim.highlight.create("NavicIconsFunction", { default = true, link = "Function" })
-    -- vim.highlight.create("NavicIconsVariable", { default = true, link = "Constant" })
-    -- vim.highlight.create("NavicIconsConstant", { default = true, link = "Constant" })
-    -- vim.highlight.create("NavicIconsString", { default = true, link = "String" })
-    -- vim.highlight.create("NavicIconsNumber", { default = true, link = "Number" })
-    -- vim.highlight.create("NavicIconsBoolean", { default = true, link = "Boolean" })
-    -- vim.highlight.create("NavicIconsArray", { default = true, link = "Constant" })
-    -- vim.highlight.create("NavicIconsObject", { default = true, link = "Structure" })
-    -- vim.highlight.create("NavicIconsKey", { default = true, link = "Identifier" })
-    -- vim.highlight.create("NavicIconsNull", { default = true, link = "Constant" })
-    -- vim.highlight.create("NavicIconsEnumMember", { default = true, link = "Constant" })
-    -- vim.highlight.create("NavicIconsStruct", { default = true, link = "Structure" })
-    -- vim.highlight.create("NavicIconsEvent", { default = true, link = "Identifier" })
-    -- vim.highlight.create("NavicIconsOperator", { default = true, link = "Operator" })
-    -- vim.highlight.create("NavicIconsTypeParameter", { default = true, link = "Type" })
-  end,
   opts = {
-    separator = " ➤ ",
-    highlight = true,
-    depth_limit = 5,
-    depth_limit_indicator = "..",
+    separator = " > ",
+  highlight = true, -- enables syntax highlighting of symbols
+  click = false, -- enable mouse click to jump to symbol (rarely used)
+  depth_limit = 0, -- 0 = no limit; set to e.g. 5 to truncate deep paths
+  depth_limit_indicator = "..", -- shown when depth is limited
+  icons = {
+    File = "󰈙 ",
+    Module = " ",
+    Namespace = "󰌗 ",
+    Package = "󰏗 ",
+    Class = "󰌗 ",
+    Method = "󰆧 ",
+    Property = " ",
+    Field = " ",
+    Constructor = " ",
+    Enum = " ",
+    Interface = " ",
+    Function = "󰊕 ",
+    Variable = "󰫧 ",
+    Constant = "󰏿 ",
+    String = "󰉿 ",
+    Number = "󰎠 ",
+    Boolean = "◩ ",
+    Array = "󰅪 ",
+    Object = "󰅩 ",
+    Key = "󰌋 ",
+    Null = "󰟢 ",
+    EnumMember = " ",
+    Struct = "󰙅 ",
+    Event = " ",
+    Operator = "󰆕 ",
+    TypeParameter = "󰊄 ",
   },
+  },
+  init = function()
+    -- Set up global navic LSP attach hook
+    vim.api.nvim_create_autocmd("LspAttach", {
+      group = vim.api.nvim_create_augroup("NavicAttach", { clear = true }),
+      callback = function(args)
+        local client = vim.lsp.get_client_by_id(args.data.client_id)
+        if client and client.server_capabilities.documentSymbolProvider then
+          require("nvim-navic").attach(client, args.buf)
+        end
+      end,
+    })
+
+    -- Show navic's breadcrumbs in the winbar
+vim.opt.winbar = "%{%v:lua.require'nvim-navic'.get_location()%}"
+  end,
 }

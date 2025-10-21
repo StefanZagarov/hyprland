@@ -59,9 +59,6 @@ vim.o.signcolumn = "yes"
 
 -- Keep messages visible longer
 vim.opt.updatetime = 250
-vim.opt.timeoutlen = 500
--- vim.o.shortmess:append("F") -- prevent file messages from truncating
-
 -- Decrease mapped sequence wait time
 vim.o.timeoutlen = 300
 
@@ -97,9 +94,6 @@ vim.o.confirm = true
 -- Clear highlights on search when pressing <Esc> in normal mode
 --  See `:help hlsearch`
 vim.keymap.set("n", "<Esc>", "<cmd>nohlsearch<CR>")
-
--- Diagnostic keymaps - add shortcuts here, we can make whole scripts to execute on shortcut
-vim.keymap.set("n", "<leader>q", vim.diagnostic.setloclist, { desc = "Open diagnostic [Q]uickfix list" })
 
 -- Exit terminal mode in the builtin terminal with a shortcut that is a bit easier
 -- Otherwise, you normally need to press <C-\><C-n>, which
@@ -212,10 +206,10 @@ require("lazy").setup({
 
 	-- Multicursor support
 	{
-    "mg979/vim-visual-multi",
-    branch = "master",
-    event = "VeryLazy",
-},
+		"mg979/vim-visual-multi",
+		branch = "master",
+		event = "VeryLazy",
+	},
 
 	-- NOTE: Plugins can also be configured to run Lua code when they are loaded.
 	--
@@ -279,7 +273,7 @@ require("lazy").setup({
 				{ "<leader>s", group = "[S]earch" },
 				{ "<leader>t", group = "[T]erminal" },
 				{ "<leader>T", group = "[T]oggle" },
-				{ "<leader>h", group = "Git [H]unk", mode = { "n", "v" } },
+				{ "<leader>H", group = "Git [H]unk", mode = { "n", "v" } },
 			},
 		},
 	},
@@ -842,19 +836,19 @@ require("lazy").setup({
 				},
 				config = function()
 					local luasnip = require("luasnip")
-					
+
 					-- Extend JavaScript snippets to React filetypes
 					luasnip.filetype_extend("javascriptreact", { "javascript" })
 					luasnip.filetype_extend("javascript.jsx", { "javascript" })
-					
+
 					-- Extend TypeScript snippets to React filetypes
 					luasnip.filetype_extend("typescriptreact", { "typescript", "javascript" })
 					luasnip.filetype_extend("typescript.tsx", { "typescript", "javascript" })
-					
+
 					-- Optional: Add HTML snippets to JSX/TSX files for JSX elements
 					luasnip.filetype_extend("javascriptreact", { "html" })
 					luasnip.filetype_extend("typescriptreact", { "html" })
-					
+
 					-- Setup LuaSnip with any additional options
 					luasnip.setup({
 						-- Enable autotriggered snippets
@@ -973,12 +967,14 @@ require("lazy").setup({
 			--  - yinq - [Y]ank [I]nside [N]ext [Q]uote
 			--  - ci'  - [C]hange [I]nside [']quote
 			require("mini.ai").setup({ n_lines = 500 })
-			require("mini.map").setup()
+			-- require("mini.map").setup()
+
 			-- Add/delete/replace surroundings (brackets, quotes, etc.)
 			--
 			-- - saiw) - [S]urround [A]dd [I]nner [W]ord [)]Paren
 			-- - sd'   - [S]urround [D]elete [']quotes
 			-- - sr)'  - [S]urround [R]eplace [)] [']
+
 			local comment_opts = {}
 			if pcall(require, "ts_context_commentstring.internal") then
 				comment_opts.options = {
@@ -1054,16 +1050,19 @@ require("lazy").setup({
 		--
 		--    - Incremental selection: Included, see `:help nvim-treesitter-incremental-selection-mod`
 		--    - Show your current context: https://github.com/nvim-treesitter/nvim-treesitter-context
-		-- { -- Show current function/class context above cursor (like VS Code breadcrumbs)
-		-- 	"nvim-treesitter/nvim-treesitter-context",
-		-- 	event = "VeryLazy",
-		-- 	opts = {
-		-- 		max_lines = 1,
-		-- 		multiline_threshold = 20,
-		-- 		separator = "-", -- or "─"
-		-- 		zindex = 20,
-		-- 	},
-		-- },
+
+		-- Disabled as I am using nvim-navic
+		{ -- Show current function/class context above cursor (like VS Code breadcrumbs)
+			"nvim-treesitter/nvim-treesitter-context",
+			event = "VeryLazy",
+			opts = {
+				max_lines = 1,
+				multiline_threshold = 20,
+				separator = "", -- or "─"
+				zindex = 20,
+			},
+		},
+
 		--    - Treesitter + textobjects: https://github.com/nvim-treesitter/nvim-treesitter-textobjects
 		{ -- Syntax-aware text objects (e.g. `af` = a function, `if` = inner function)
 			"nvim-treesitter/nvim-treesitter-textobjects",
@@ -1169,3 +1168,4 @@ vim.api.nvim_create_autocmd({ "TextChanged", "TextChangedI", "TextChangedP" }, {
 		end
 	end,
 })
+
