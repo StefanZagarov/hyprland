@@ -134,6 +134,7 @@ keymap = [
 	{ on = [ "g", "d" ],       run = "cd ~/Downloads",   desc = "Go ~/Downloads" },
 	{ on = [ "g", "a" ],     run = "cd ~/Arch/Hyprland", desc = "Go to Hyprland config folder" },
 	{ on = [ "g", "w" ],       run = "cd ~/Work",        desc = "Go to Work folder" },
+    { on =  ["g", "t" ],       run = "cd '~/JavaScript Projects'", desc = "Go to JS Projects folder"},
 	{ on = [ "g", "<Space>" ], run = "cd --interactive", desc = "Jump interactively" },
 	{ on = [ "g", "f" ],       run = "follow",           desc = "Follow hovered symlink" },
 
