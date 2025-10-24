@@ -60,8 +60,12 @@ keymap = [
 
 	# Operation
 	{ on = "o",         run = "open",                        	  		 desc = "Open selected files" },
-	{ on = "T", run = "shell -- setsid alacritty --working-directory .", desc = "Open terminal in current directory" },
-	{ on = "O",         run = "open --interactive",          	  		 desc = "Open selected files interactively" },
+    # Open Alacritty in the current directory as root
+	{ on = "T",         run = "shell -- setsid alacritty --working-directory .", desc = "Open terminal in current directory" },
+    # Open Neovim in current directory as root
+    { on = "n",         run = "shell '~/.local/bin/yazi-to-neovim \"$PWD\"'",  desc = "Open Neovim in current directory, closes Yazi" },
+    { on = "N",         run = "shell -- setsid alacritty --working-directory . -e nvim .",  desc= "Open Neovim in current directory without closing Yazi" },
+    { on = "O",         run = "open --interactive",          	  		 desc = "Open selected files interactively" },
 	{ on = "<Enter>",   run = "open",                        	  		 desc = "Open selected files" },
 	{ on = "<S-Enter>", run = "open --interactive",          	  		 desc = "Open selected files interactively" },
 	{ on = "y",         run = "yank",                        	  		 desc = "Yank selected files (copy)" },
