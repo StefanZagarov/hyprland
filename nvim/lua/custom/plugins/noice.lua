@@ -3,6 +3,7 @@ return {
 	event = "VeryLazy", -- Load after startup for better performance
 	dependencies = {
 		"MunifTanjim/nui.nvim", -- Required UI component library
+		"rcarriga/nvim-notify",
 	},
 	opts = {
 		lsp = {
@@ -32,7 +33,7 @@ return {
 		presets = {
 			-- Use a classic bottom search instead of floating
 			-- true = classic bottom, false = floating cmdline
-			bottom_search = true,
+			bottom_search = false,
 			-- Position the cmdline and popupmenu together (like VSCode command palette)
 			-- true = together at top, false = separate
 			command_palette = true,
@@ -61,7 +62,7 @@ return {
 				align = "message-right",
 				-- How long notification stays visible (milliseconds)
 				-- 2000 = 2 seconds. Set to false to keep visible until dismissed
-				timeout = 2000,
+				timeout = 5000,
 				-- Reverse = true means newest messages on top (stack upward)
 				-- false = newest messages on bottom (stack downward)
 				reverse = true,
@@ -128,3 +129,4 @@ return {
 		})
 	end,
 }
+

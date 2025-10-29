@@ -1,7 +1,6 @@
 -- ### Kickstart ###
 
 -- ## NeoVim global variables ##
-
 -- Indentation
 vim.opt.tabstop = 4
 vim.opt.shiftwidth = 4
@@ -119,13 +118,27 @@ vim.keymap.set("n", "<C-j>", "<C-w><C-j>", { desc = "Move focus to the lower win
 vim.keymap.set("n", "<C-k>", "<C-w><C-k>", { desc = "Move focus to the upper window" })
 
 -- NOTE: Some terminals have colliding keymaps or are not able to send distinct keycodes
--- vim.keymap.set("n", "<C-S-h>", "<C-w>H", { desc = "Move window to the left" })
--- vim.keymap.set("n", "<C-S-l>", "<C-w>L", { desc = "Move window to the right" })
--- vim.keymap.set("n", "<C-S-j>", "<C-w>J", { desc = "Move window to the lower" })
--- vim.keymap.set("n", "<C-S-k>", "<C-w>K", { desc = "Move window to the upper" })
+vim.keymap.set("n", "<C-S-h>", "<C-w>H", { desc = "Move window to the left" })
+vim.keymap.set("n", "<C-S-l>", "<C-w>L", { desc = "Move window to the right" })
+vim.keymap.set("n", "<C-S-j>", "<C-w>J", { desc = "Move window to the lower" })
+vim.keymap.set("n", "<C-S-k>", "<C-w>K", { desc = "Move window to the upper" })
+
+vim.keymap.set("n", "<C-A-j>", "<cmd>m .+1<CR>==", { desc = "Move line down" })
+-- Move current line or visual selection up/down
+vim.keymap.set("n", "<C-A-k>", "<cmd>m .-2<CR>==", { desc = "Move line up" })
+vim.keymap.set("v", "<C-A-j>", ":m '>+1<CR>==", { desc = "Move visual selection down" })
+vim.keymap.set("v", "<C-A-k>", ":m '<-2<CR>==", { desc = "Move visual selection up" })
 
 -- [[ Basic Autocommands ]] - autocommand is basically an envent listener
 --  See `:help lua-guide-autocommands`
+
+-- Auto-save all buffers when Neovim loses focus
+vim.api.nvim_create_autocmd("FocusLost", {
+	group = vim.api.nvim_create_augroup("AutoSave", { clear = true }),
+	callback = function()
+		vim.cmd("silent! wall")
+	end,
+})
 
 -- Highlight when yanking (copying) text
 --  Try it with `yap` in normal mode
@@ -937,8 +950,11 @@ require("lazy").setup({
 		config = function()
 			---@diagnostic disable-next-line: missing-fields
 			require("tokyonight").setup({
+				transparent = true,
 				styles = {
 					comments = { italic = false }, -- Disable italics in comments
+					sidebars = "transparent",
+					floats = "transparent",
 				},
 			})
 
@@ -1092,13 +1108,15 @@ require("lazy").setup({
 							enable = true,
 							set_jumps = true,
 							goto_next_start = {
-								 ["]m"] = "@class.outer",
-							 ["]}"] = "@function.inner",
-							 ["]]"] = "@function.outer" },
-							goto_previous_start = { 
-								["[m"] = "@class.outer", 
+								["]m"] = "@class.outer",
+								["]}"] = "@function.inner",
+								["]]"] = "@function.outer",
+							},
+							goto_previous_start = {
+								["[m"] = "@class.outer",
 								["[{"] = "@function.inner",
-								["[["] = "@function.outer" },
+								["[["] = "@function.outer",
+							},
 						},
 						swap = {
 							enable = true,
@@ -1174,4 +1192,3 @@ vim.api.nvim_create_autocmd({ "TextChanged", "TextChangedI", "TextChangedP" }, {
 		end
 	end,
 })
-
