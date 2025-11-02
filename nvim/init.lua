@@ -940,31 +940,206 @@ require("lazy").setup({
 		},
 	},
 
-	{ -- You can easily change to a different colorscheme.
-		-- Change the name of the colorscheme plugin below, and then
-		-- change the command in the config to whatever the name of that colorscheme is.
-		--
-		-- If you want to see what colorschemes are already installed, you can use `:Telescope colorscheme`.
-		"folke/tokyonight.nvim",
-		priority = 1000, -- Make sure to load this before all the other start plugins.
-		config = function()
-			---@diagnostic disable-next-line: missing-fields
-			require("tokyonight").setup({
-				transparent = true,
-				styles = {
-					comments = { italic = false }, -- Disable italics in comments
-					sidebars = "transparent",
-					floats = "transparent",
-				},
-			})
+	-- Color themes (:Telescope themes - to view themes (custom script), :Telescope colorscheme - to view all themes (built-in, no transparent support))
+	-- Theme switching:
+	--   :Telescope themes        → pick visually
+	--   :TokyoNightOpaque        → solid background
+	--   :TokyoNightTransparent   → native transparency
 
-			-- Load the colorscheme here.
-			-- Like many other themes, this one has different styles, and you could load
-			-- any other, such as 'tokyonight-storm', 'tokyonight-moon', or 'tokyonight-day'.
-			vim.cmd.colorscheme("tokyonight-night")
+	-- Theme persistence system (global for all themes)
+	{
+		"theme-persistence",
+		dir = vim.fn.stdpath("config"),
+		priority = 1001, -- Load before themes
+		config = function()
+			require("custom.scripts.theme-persistence").setup()
 		end,
 	},
 
+	{
+		"folke/tokyonight.nvim",
+		priority = 1000,
+		lazy = false,
+		config = function()
+			-- Register default variant
+			vim.api.nvim_create_user_command("TokyoNight", function()
+				---@diagnostic disable-next-line: missing-fields
+				require("tokyonight").setup({
+					style = "night",
+					transparent = false, -- explicit
+					styles = {
+						comments = { italic = false },
+					},
+				})
+				vim.cmd.colorscheme("tokyonight")
+				save_theme("TokyoNight")
+			end, {})
+
+			-- Register TRANSPARENT variant
+			vim.api.nvim_create_user_command("TokyoNightTransparent", function()
+				---@diagnostic disable-next-line: missing-fields
+				require("tokyonight").setup({
+					style = "night",
+					transparent = true, -- explicit
+					styles = {
+						comments = { italic = false },
+						sidebars = "transparent",
+						floats = "transparent",
+					},
+				})
+				vim.cmd.colorscheme("tokyonight")
+				save_theme("TokyoNightTransparent")
+			end, {})
+		end,
+	},
+	{
+		"rebelot/kanagawa.nvim",
+		priority = 1000,
+		lazy = false,
+		config = function()
+			-- Register default Kanagawa
+			vim.api.nvim_create_user_command("Kanagawa", function()
+				require("kanagawa").setup({
+					compile = false, -- disable compilation for faster switching
+					transparent = false,
+					overrides = function()
+						return {
+							Comment = { italic = false },
+						}
+					end,
+				})
+				vim.cmd.colorscheme("kanagawa")
+				save_theme("Kanagawa")
+			end, {})
+
+			-- Register TRANSPARENT Kanagawa
+			vim.api.nvim_create_user_command("KanagawaTransparent", function()
+				require("kanagawa").setup({
+					compile = false,
+					transparent = true, -- native transparency
+					hide_statusline = false, -- keep statusline visible (optional)
+					overrides = function()
+						return {
+							Comment = { italic = false },
+							Normal = { bg = "NONE" },
+							SignColumnSB = { bg = "NONE" },
+							-- Sign column (Git signs gutter)
+							SignColumn = { bg = "NONE" },
+							CursorLineSign = { bg = "NONE" },
+							LineNr = { bg = "NONE" },
+							CursorLineNr = { bg = "NONE" },
+							--
+							-- -- Floats
+							NormalFloat = { bg = "NONE" },
+							FloatBorder = { bg = "NONE" },
+							--
+							-- -- WinBar (if used)
+							WinBar = { bg = "NONE" },
+							WinBarNC = { bg = "NONE" },
+							--
+							-- -- StatusLine (optional)
+							StatusLine = { bg = "NONE" },
+							StatusLineNC = { bg = "NONE" },
+
+							-- GitSigns transparency (this fixes the gutter transparency!)
+							GitSignsAdd = { bg = "NONE" },
+							GitSignsChange = { bg = "NONE" },
+							GitSignsDelete = { bg = "NONE" },
+							GitSignsTopDelete = { bg = "NONE" },
+							GitSignsChangeDelete = { bg = "NONE" },
+							GitSignsUntracked = { bg = "NONE" },
+
+							-- Noice transparency (command line, popups, notifications)
+							NoiceMini = { bg = "NONE" },
+							NoiceMiniBorder = { bg = "NONE" },
+							NoiceCmdline = { bg = "NONE" },
+							NoiceCmdlinePopup = { bg = "NONE" },
+							NoiceCmdlinePopupBorder = { bg = "NONE" },
+							NoiceCmdlineIcon = { bg = "NONE" },
+							NoicePopupmenu = { bg = "NONE" },
+							NoicePopupmenuBorder = { bg = "NONE" },
+							NoiceConfirm = { bg = "NONE" },
+							NoiceConfirmBorder = { bg = "NONE" },
+						}
+					end,
+				})
+				vim.cmd.colorscheme("kanagawa")
+				save_theme("KanagawaTransparent")
+			end, {})
+
+			-- Register Kanagawa Dragon
+			vim.api.nvim_create_user_command("KanagawaDragon", function()
+				require("kanagawa").setup({
+					compile = false,
+					transparent = false,
+					theme = "dragon", -- dragon theme
+					overrides = function()
+						return {
+							Comment = { italic = false },
+						}
+					end,
+				})
+				vim.cmd.colorscheme("kanagawa-dragon")
+				save_theme("KanagawaDragon")
+			end, {})
+
+			-- Register TRANSPARENT Kanagawa Dragon
+			vim.api.nvim_create_user_command("KanagawaDragonTransparent", function()
+				require("kanagawa").setup({
+					compile = false,
+					transparent = true,
+					theme = "dragon", -- dragon theme
+					hide_statusline = false,
+					overrides = function()
+						return {
+							Comment = { italic = false },
+							Normal = { bg = "NONE" },
+							SignColumnSB = { bg = "NONE" },
+							-- Sign column (Git signs gutter)
+							SignColumn = { bg = "NONE" },
+							CursorLineSign = { bg = "NONE" },
+							LineNr = { bg = "NONE" },
+							CursorLineNr = { bg = "NONE" },
+
+							-- Floats
+							NormalFloat = { bg = "NONE" },
+							FloatBorder = { bg = "NONE" },
+
+							-- WinBar (if used)
+							WinBar = { bg = "NONE" },
+							WinBarNC = { bg = "NONE" },
+
+							-- StatusLine (optional)
+							StatusLine = { bg = "NONE" },
+							StatusLineNC = { bg = "NONE" },
+
+							-- GitSigns transparency
+							GitSignsAdd = { bg = "NONE" },
+							GitSignsChange = { bg = "NONE" },
+							GitSignsDelete = { bg = "NONE" },
+							GitSignsTopDelete = { bg = "NONE" },
+							GitSignsChangeDelete = { bg = "NONE" },
+							GitSignsUntracked = { bg = "NONE" },
+
+							-- Noice transparency
+							NoiceMini = { bg = "NONE" },
+							NoiceMiniBorder = { bg = "NONE" },
+							NoiceCmdline = { bg = "NONE" },
+							NoiceCmdlinePopup = { bg = "NONE" },
+							NoiceCmdlinePopupBorder = { bg = "NONE" },
+							NoiceCmdlineIcon = { bg = "NONE" },
+							NoicePopupmenu = { bg = "NONE" },
+							NoicePopupmenuBorder = { bg = "NONE" },
+							NoiceConfirm = { bg = "NONE" },
+							NoiceConfirmBorder = { bg = "NONE" },
+						}
+					end,
+				})
+				vim.cmd.colorscheme("kanagawa-dragon")
+				save_theme("KanagawaDragonTransparent")
+			end, {})
+		end,
+	},
 	-- Highlight todo, notes, etc in comments
 	{
 		"folke/todo-comments.nvim",
@@ -1177,11 +1352,14 @@ require("lazy").setup({
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
-
+--
 -- ### My Config ###
+-- Custom keymaps
 -- Fix paste so cursor lands at end of block
 vim.keymap.set("n", "p", "p`]", { noremap = true, silent = true })
 vim.keymap.set("n", "P", "P`]", { noremap = true, silent = true })
+-- Telescope theme picker
+vim.keymap.set("n", "<leader>ct", "<cmd>Telescope themes<CR>", { desc = "Choose Theme" })
 
 -- ## TEMP FIX: Treesitter "Invalid 'end_row'" on undo (remove when fixed in update). Potential tiny performance hit on very large files. ##
 vim.api.nvim_create_autocmd({ "TextChanged", "TextChangedI", "TextChangedP" }, {
@@ -1192,3 +1370,19 @@ vim.api.nvim_create_autocmd({ "TextChanged", "TextChangedI", "TextChangedP" }, {
 		end
 	end,
 })
+
+-- Custom scripts - theme switcher
+require("telescope").load_extension("themes")
+
+-- Load last used theme (centralized, scalable)
+-- This runs after all theme commands are registered
+vim.schedule(function()
+	local last_theme = load_last_theme()
+	if last_theme then
+		-- Load saved theme (safely, will fail gracefully if command doesn't exist)
+		pcall(vim.cmd, last_theme)
+	else
+		-- No saved theme, default to TokyoNight
+		vim.cmd("TokyoNight")
+	end
+end)
