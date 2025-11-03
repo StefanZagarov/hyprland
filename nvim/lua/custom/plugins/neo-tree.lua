@@ -95,8 +95,8 @@ return {
     })
     
     -- Keymaps
-    -- Float
-    vim.keymap.set('n', '<C-b>', ':Neotree toggle float<CR>', { silent = true, desc = "Toggle Neo-tree float" })
+    -- Float (opens at current file's directory)
+    vim.keymap.set('n', '<C-b>', ':Neotree reveal float<CR>', { silent = true, desc = "Toggle Neo-tree float" })
     -- Sidebar
     vim.keymap.set('n', '<leader>b', ':Neotree toggle left<CR>', { desc = "Toggle Neo-tree sidebar" })
   end

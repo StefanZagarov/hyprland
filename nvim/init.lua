@@ -961,7 +961,7 @@ require("lazy").setup({
 		priority = 1000,
 		lazy = false,
 		config = function()
-			-- Register default variant
+			-- Register default TokyoNight
 			vim.api.nvim_create_user_command("TokyoNight", function()
 				---@diagnostic disable-next-line: missing-fields
 				require("tokyonight").setup({
@@ -972,10 +972,14 @@ require("lazy").setup({
 					},
 				})
 				vim.cmd.colorscheme("tokyonight")
+				-- Remove color from folded lines's background
+				vim.cmd("hi Folded guibg=NONE ctermbg=NONE")
+				vim.cmd("hi FoldColumn guibg=NONE ctermbg=NONE")
+
 				save_theme("TokyoNight")
 			end, {})
 
-			-- Register TRANSPARENT variant
+			-- Register TRANSPARENT TokyoNight
 			vim.api.nvim_create_user_command("TokyoNightTransparent", function()
 				---@diagnostic disable-next-line: missing-fields
 				require("tokyonight").setup({
@@ -986,8 +990,16 @@ require("lazy").setup({
 						sidebars = "transparent",
 						floats = "transparent",
 					},
+					on_highlights = function(hl, c)
+						-- WinBar (breadcrumb showing current function) transparency
+						hl.WinBar = { bg = "NONE", fg = c.fg_dark }
+						hl.WinBarNC = { bg = "NONE", fg = c.fg_gutter }
+					end,
 				})
 				vim.cmd.colorscheme("tokyonight")
+				vim.cmd("hi Folded guibg=NONE ctermbg=NONE")
+				vim.cmd("hi FoldColumn guibg=NONE ctermbg=NONE")
+
 				save_theme("TokyoNightTransparent")
 			end, {})
 		end,
@@ -1005,10 +1017,20 @@ require("lazy").setup({
 					overrides = function()
 						return {
 							Comment = { italic = false },
+							-- Match gutter to background
+							SignColumn = { bg = "NONE" },
+							LineNr = { bg = "NONE" },
+							CursorLineNr = { bg = "NONE" },
+							-- GitSigns gutter symbols
+							GitSignsAdd = { bg = "NONE" },
+							GitSignsChange = { bg = "NONE" },
+							GitSignsDelete = { bg = "NONE" },
 						}
 					end,
 				})
 				vim.cmd.colorscheme("kanagawa")
+				vim.cmd("hi Folded guibg=NONE ctermbg=NONE")
+				vim.cmd("hi FoldColumn guibg=NONE ctermbg=NONE")
 				save_theme("Kanagawa")
 			end, {})
 
@@ -1021,8 +1043,10 @@ require("lazy").setup({
 					overrides = function()
 						return {
 							Comment = { italic = false },
+
 							Normal = { bg = "NONE" },
 							SignColumnSB = { bg = "NONE" },
+
 							-- Sign column (Git signs gutter)
 							SignColumn = { bg = "NONE" },
 							CursorLineSign = { bg = "NONE" },
@@ -1064,6 +1088,9 @@ require("lazy").setup({
 					end,
 				})
 				vim.cmd.colorscheme("kanagawa")
+				vim.cmd("hi Folded guibg=NONE ctermbg=NONE")
+				vim.cmd("hi FoldColumn guibg=NONE ctermbg=NONE")
+
 				save_theme("KanagawaTransparent")
 			end, {})
 
@@ -1076,10 +1103,21 @@ require("lazy").setup({
 					overrides = function()
 						return {
 							Comment = { italic = false },
+							-- Match gutter to background
+							SignColumn = { bg = "NONE" },
+							LineNr = { bg = "NONE" },
+							CursorLineNr = { bg = "NONE" },
+							-- GitSigns gutter symbols
+							GitSignsAdd = { bg = "NONE" },
+							GitSignsChange = { bg = "NONE" },
+							GitSignsDelete = { bg = "NONE" },
 						}
 					end,
 				})
 				vim.cmd.colorscheme("kanagawa-dragon")
+				vim.cmd("hi Folded guibg=NONE ctermbg=NONE")
+				vim.cmd("hi FoldColumn guibg=NONE ctermbg=NONE")
+
 				save_theme("KanagawaDragon")
 			end, {})
 
@@ -1136,6 +1174,9 @@ require("lazy").setup({
 					end,
 				})
 				vim.cmd.colorscheme("kanagawa-dragon")
+				vim.cmd("hi Folded guibg=NONE ctermbg=NONE")
+				vim.cmd("hi FoldColumn guibg=NONE ctermbg=NONE")
+
 				save_theme("KanagawaDragonTransparent")
 			end, {})
 		end,

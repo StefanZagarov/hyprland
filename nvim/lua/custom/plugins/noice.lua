@@ -111,22 +111,4 @@ return {
 			},
 		},
 	},
-	config = function(_, opts)
-		require("noice").setup(opts)
-
-		-- Set custom highlight colors after noice loads
-		-- This ensures Tokyo Night doesn't override them
-		vim.api.nvim_set_hl(0, "NoiceMini", {
-			bg = "#1A1B26", -- Background color (Tokyo Night dark)
-			-- Try: "#24283b" (lighter), "#16161e" (darker), "NONE" (fully transparent)
-			fg = "#c0caf5", -- Text color (Tokyo Night foreground)
-			-- Try: "#a9b1d6" (dimmer), "#ffffff" (bright white)
-		})
-		vim.api.nvim_set_hl(0, "NoiceMiniBorder", {
-			bg = "#1A1B26", -- Border background (Tokyo Night dark)
-			fg = "#7aa2f7", -- Border color (Tokyo Night blue)
-			-- Try: "#bb9af7" (purple), "#9ece6a" (green), "#f7768e" (red)
-		})
-	end,
 }
-
