@@ -943,8 +943,12 @@ require("lazy").setup({
 	-- Color themes (:Telescope themes - to view themes (custom script), :Telescope colorscheme - to view all themes (built-in, no transparent support))
 	-- Theme switching:
 	--   :Telescope themes        → pick visually
-	--   :TokyoNightOpaque        → solid background
+	--   :TokyoNight              → solid background
 	--   :TokyoNightTransparent   → native transparency
+	--   :Kanagawa                → solid background
+	--   :KanagawaTransparent     → native transparency
+	--   :KanagawaDragon          → solid background
+	--   :KanagawaDragonTransparent → native transparency
 
 	-- Theme persistence system (global for all themes)
 	{
@@ -1025,6 +1029,38 @@ require("lazy").setup({
 							GitSignsAdd = { bg = "NONE" },
 							GitSignsChange = { bg = "NONE" },
 							GitSignsDelete = { bg = "NONE" },
+
+							-- 🔹 Swapped Kanagawa Colors
+							-- Constants/readonly variables should be SOFT BLUE (#76cce0)
+							["@lsp.mod.readonly"] = { fg = "#76cce0" }, -- const variables
+							["@lsp.typemod.variable.readonly"] = { fg = "#76cce0" }, -- const variables
+
+							-- Function parameters should be ORANGE (#ff9e64)
+							["@lsp.type.parameter"] = { fg = "#ff9e64" }, -- function parameters
+							["@lsp.typemod.parameter.declaration"] = { fg = "#ff9e64" }, -- function parameters
+
+							-- 🔹 BASE TREESITTER SYNTAX HIGHLIGHTING (fallback)
+							-- Variables (object properties, etc.) - soft blue
+							["@variable"] = { fg = "#76cce0" }, -- TS variable (soft cyan)
+							["@variable.builtin"] = { fg = "#ff9e64" }, -- e.g., `self`, `this`
+
+							-- Parameters (fallback for non-LSP files) - orange
+							["@parameter"] = { fg = "#ff9e64" }, -- function params (orange)
+							["@parameter.builtin"] = { fg = "#ff9e64" },
+
+							-- Numbers
+							javaScriptNumber = { fg = "#ff5d62" }, -- Orange (Kanagawa's default number color)
+							Number = { fg = "#ff5d62" }, -- Base number group
+
+							-- If you want Treesitter/LSP fallbacks too:
+							["@number"] = { fg = "#ff5d62" }, -- Treesitter numbers
+							["@lsp.type.number"] = { fg = "#ff5d62" }, -- LSP semantic tokens
+
+							-- Diagnostic styling
+							DiagnosticSignError = { bg = "NONE" },
+							DiagnosticSignWarn = { bg = "NONE" },
+							DiagnosticSignInfo = { bg = "NONE" },
+							DiagnosticSignHint = { bg = "NONE" },
 						}
 					end,
 				})
@@ -1052,15 +1088,15 @@ require("lazy").setup({
 							CursorLineSign = { bg = "NONE" },
 							LineNr = { bg = "NONE" },
 							CursorLineNr = { bg = "NONE" },
-							--
+
 							-- -- Floats
 							NormalFloat = { bg = "NONE" },
 							FloatBorder = { bg = "NONE" },
-							--
+
 							-- -- WinBar (if used)
 							WinBar = { bg = "NONE" },
 							WinBarNC = { bg = "NONE" },
-							--
+
 							-- -- StatusLine (optional)
 							StatusLine = { bg = "NONE" },
 							StatusLineNC = { bg = "NONE" },
@@ -1084,6 +1120,75 @@ require("lazy").setup({
 							NoicePopupmenuBorder = { bg = "NONE" },
 							NoiceConfirm = { bg = "NONE" },
 							NoiceConfirmBorder = { bg = "NONE" },
+
+							-- 🔹 Swapped Kanagawa Colors
+							-- Constants/readonly variables should be SOFT BLUE (#76cce0)
+							["@lsp.mod.readonly"] = { fg = "#76cce0" }, -- const variables
+							["@lsp.typemod.variable.readonly"] = { fg = "#76cce0" }, -- const variables
+
+							-- Function parameters should be ORANGE (#ff9e64)
+							["@lsp.type.parameter"] = { fg = "#ff9e64" }, -- function parameters
+							["@lsp.typemod.parameter.declaration"] = { fg = "#ff9e64" }, -- function parameters
+
+							-- 🔹 BASE TREESITTER SYNTAX HIGHLIGHTING (fallback)
+							-- Variables (object properties, etc.) - soft blue
+							["@variable"] = { fg = "#76cce0" }, -- TS variable (soft cyan)
+							["@variable.builtin"] = { fg = "#ff9e64" }, -- e.g., `self`, `this`
+
+							-- Parameters (fallback for non-LSP files) - orange
+							["@parameter"] = { fg = "#ff9e64" }, -- function params (orange)
+							["@parameter.builtin"] = { fg = "#ff9e64" },
+
+							-- Numbers
+							javaScriptNumber = { fg = "#ff5d62" }, -- Orange (Kanagawa's default number color)
+							Number = { fg = "#ff5d62" }, -- Base number group
+
+							-- If you want Treesitter/LSP fallbacks too:
+							["@number"] = { fg = "#ff5d62" }, -- Treesitter numbers
+							["@lsp.type.number"] = { fg = "#ff5d62" }, -- LSP semantic tokens
+
+							-- Diagnostic styling
+							DiagnosticSignError = { bg = "NONE" },
+							DiagnosticSignWarn = { bg = "NONE" },
+							DiagnosticSignInfo = { bg = "NONE" },
+							DiagnosticSignHint = { bg = "NONE" },
+
+							-- 🔹 FIX BORDERS AND UI ELEMENTS
+							WinSeparator = { bg = "NONE", fg = "#545c7e" }, -- Window separator lines (|)
+							VertSplit = { bg = "NONE", fg = "#545c7e" }, -- Vertical split lines
+
+							-- Popup menus (completion, etc.)
+							Pmenu = { bg = "NONE", fg = "#c0caf5" }, -- Popup menu background
+							PmenuSel = { bg = "#414868", fg = "#c0caf5" }, -- Selected item (keep subtle bg for visibility)
+							PmenuSbar = { bg = "NONE" }, -- Scrollbar
+							PmenuThumb = { bg = "#545c7e" }, -- Scrollbar thumb
+
+							-- Tab line
+							TabLine = { bg = "NONE", fg = "#545c7e" }, -- Tab line background
+							TabLineSel = { bg = "NONE", fg = "#c0caf5" }, -- Active tab
+							TabLineFill = { bg = "NONE" }, -- Filler space
+
+							-- Window elements
+
+							-- Terminal elements
+							TermCursor = { bg = "#ff9e64", fg = "#1f1f28" }, -- Terminal cursor
+							TermCursorNC = { bg = "#545c7e", fg = "#1f1f28" }, -- Non-active terminal cursor
+
+							-- Wild menu (completion menu)
+							WildMenu = { bg = "NONE", fg = "#bb9af7" }, -- Wild menu
+
+							-- Diagnostic float border
+							DiagnosticFloatBorder = { bg = "NONE", fg = "#545c7e" },
+
+							-- LSP hover border
+							LspFloatWinBorder = { bg = "NONE", fg = "#545c7e" },
+							LspInfoBorder = { bg = "NONE", fg = "#545c7e" },
+
+							-- Telescope borders
+							TelescopeBorder = { bg = "NONE", fg = "#545c7e" },
+							TelescopePromptBorder = { bg = "NONE", fg = "#545c7e" },
+							TelescopeResultsBorder = { bg = "NONE", fg = "#545c7e" },
+							TelescopePreviewBorder = { bg = "NONE", fg = "#545c7e" },
 						}
 					end,
 				})
@@ -1111,6 +1216,38 @@ require("lazy").setup({
 							GitSignsAdd = { bg = "NONE" },
 							GitSignsChange = { bg = "NONE" },
 							GitSignsDelete = { bg = "NONE" },
+
+							-- 🔹 Swapped Kanagawa Colors
+							-- Constants/readonly variables should be SOFT BLUE (#76cce0)
+							["@lsp.mod.readonly"] = { fg = "#8ea4a2" }, -- const variables
+							["@lsp.typemod.variable.readonly"] = { fg = "#8ea4a2" }, -- const variables
+
+							-- Function parameters should be ORANGE (#ff9e64)
+							["@lsp.type.parameter"] = { fg = "#b6927b" }, -- function parameters
+							["@lsp.typemod.parameter.declaration"] = { fg = "#b6927b" }, -- function parameters
+
+							-- 🔹 BASE TREESITTER SYNTAX HIGHLIGHTING (fallback)
+							-- Variables (object properties, etc.) - soft blue
+							["@variable"] = { fg = "#8ea4a2" }, -- TS variable (soft cyan)
+							["@variable.builtin"] = { fg = "#b6927b" }, -- e.g., `self`, `this`
+
+							-- Parameters (fallback for non-LSP files) - orange
+							["@parameter"] = { fg = "#b6927b" }, -- function params (orange)
+							["@parameter.builtin"] = { fg = "#b6927b" },
+
+							-- Numbers
+							javaScriptNumber = { fg = "#a36d6d" }, -- Orange (Kanagawa's default number color)
+							Number = { fg = "#a36d6d" }, -- Base number group
+
+							-- If you want Treesitter/LSP fallbacks too:
+							["@number"] = { fg = "#a36d6d" }, -- Treesitter numbers
+							["@lsp.type.number"] = { fg = "#a36d6d" }, -- LSP semantic tokens
+
+							-- Diagnostic styling
+							DiagnosticSignError = { bg = "NONE" },
+							DiagnosticSignWarn = { bg = "NONE" },
+							DiagnosticSignInfo = { bg = "NONE" },
+							DiagnosticSignHint = { bg = "NONE" },
 						}
 					end,
 				})
@@ -1170,6 +1307,59 @@ require("lazy").setup({
 							NoicePopupmenuBorder = { bg = "NONE" },
 							NoiceConfirm = { bg = "NONE" },
 							NoiceConfirmBorder = { bg = "NONE" },
+
+							-- 🔹 Swapped Kanagawa Colors
+							-- Constants/readonly variables should be SOFT BLUE (#76cce0)
+							["@lsp.mod.readonly"] = { fg = "#8ea4a2" }, -- const variables
+							["@lsp.typemod.variable.readonly"] = { fg = "#8ea4a2" }, -- const variables
+
+							-- Function parameters should be ORANGE (#ff9e64)
+							["@lsp.type.parameter"] = { fg = "#b6927b" }, -- function parameters
+							["@lsp.typemod.parameter.declaration"] = { fg = "#b6927b" }, -- function parameters
+
+							-- 🔹 BASE TREESITTER SYNTAX HIGHLIGHTING (fallback)
+							-- Variables (object properties, etc.) - soft blue
+							["@variable"] = { fg = "#8ea4a2" }, -- TS variable (soft cyan)
+							["@variable.builtin"] = { fg = "#b6927b" }, -- e.g., `self`, `this`
+
+							-- Parameters (fallback for non-LSP files) - orange
+							["@parameter"] = { fg = "#b6927b" }, -- function params (orange)
+							["@parameter.builtin"] = { fg = "#b6927b" },
+
+							-- Numbers
+							javaScriptNumber = { fg = "#a36d6d" }, -- Orange (Kanagawa's default number color)
+							Number = { fg = "#a36d6d" }, -- Base number group
+
+							-- If you want Treesitter/LSP fallbacks too:
+							["@number"] = { fg = "#a36d6d" }, -- Treesitter numbers
+							["@lsp.type.number"] = { fg = "#a36d6d" }, -- LSP semantic tokens
+
+							-- Diagnostic styling
+							DiagnosticSignError = { bg = "NONE" },
+							DiagnosticSignWarn = { bg = "NONE" },
+							DiagnosticSignInfo = { bg = "NONE" },
+							DiagnosticSignHint = { bg = "NONE" },
+
+							-- 🔹 FIX BORDERS AND UI ELEMENTS (same as above)
+							WinSeparator = { bg = "NONE", fg = "#545c7e" },
+							VertSplit = { bg = "NONE", fg = "#545c7e" },
+							Pmenu = { bg = "NONE", fg = "#c0caf5" },
+							PmenuSel = { bg = "#414868", fg = "#c0caf5" },
+							PmenuSbar = { bg = "NONE" },
+							PmenuThumb = { bg = "#545c7e" },
+							TabLine = { bg = "NONE", fg = "#545c7e" },
+							TabLineSel = { bg = "NONE", fg = "#c0caf5" },
+							TabLineFill = { bg = "NONE" },
+							TermCursor = { bg = "#ff9e64", fg = "#1f1f28" },
+							TermCursorNC = { bg = "#545c7e", fg = "#1f1f28" },
+							WildMenu = { bg = "NONE", fg = "#bb9af7" },
+							DiagnosticFloatBorder = { bg = "NONE", fg = "#545c7e" },
+							LspFloatWinBorder = { bg = "NONE", fg = "#545c7e" },
+							LspInfoBorder = { bg = "NONE", fg = "#545c7e" },
+							TelescopeBorder = { bg = "NONE", fg = "#545c7e" },
+							TelescopePromptBorder = { bg = "NONE", fg = "#545c7e" },
+							TelescopeResultsBorder = { bg = "NONE", fg = "#545c7e" },
+							TelescopePreviewBorder = { bg = "NONE", fg = "#545c7e" },
 						}
 					end,
 				})
