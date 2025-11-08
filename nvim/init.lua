@@ -1030,23 +1030,39 @@ require("lazy").setup({
 							GitSignsChange = { bg = "NONE" },
 							GitSignsDelete = { bg = "NONE" },
 
-							-- 🔹 Swapped Kanagawa Colors
-							-- Constants/readonly variables should be SOFT BLUE (#76cce0)
-							["@lsp.mod.readonly"] = { fg = "#76cce0" }, -- const variables
-							["@lsp.typemod.variable.readonly"] = { fg = "#76cce0" }, -- const variables
+							-- Original colors:
+							-- const variable  ORANGE - #FFA066
+							-- let variable DIRTY WHITE - #DCD7BA
+							-- function BLUE - #7E9CD8
+							-- method LIGHT BLUE - #7FB4CA
+							-- function property LIGHT PURPLE - #B8B4D0
 
-							-- Function parameters should be ORANGE (#ff9e64)
-							["@lsp.type.parameter"] = { fg = "#ff9e64" }, -- function parameters
-							["@lsp.typemod.parameter.declaration"] = { fg = "#ff9e64" }, -- function parameters
+							-- 🔹 Swapped Kanagawa Colors
+							-- Constants/readonly variables
+							["@lsp.mod.readonly"] = { fg = "#7E9CD8" }, -- const variables
+							["@lsp.typemod.variable.readonly"] = { fg = "#7E9CD8" }, -- const variables
+
+							-- 🔹 BASE COLOR FOR ALL VARIABLES (including let declarations)
+							["@lsp.type.variable"] = { fg = "#B8B4D0" }, -- Base color for all variables
+
+							-- Function parameters
+							["@lsp.type.parameter"] = { fg = "#7FB4CA" },
+							["@lsp.typemod.parameter.declaration"] = { fg = "#7FB4CA" },
+
+							-- Function name
+							["@lsp.type.function"] = { fg = "#FFA066" },
+							["@lsp.typemod.function.declaration"] = { fg = "#FFA066" },
+
+							-- Boolean
+							["Boolean"] = { fg = "#7e9cd8" },
 
 							-- 🔹 BASE TREESITTER SYNTAX HIGHLIGHTING (fallback)
-							-- Variables (object properties, etc.) - soft blue
-							["@variable"] = { fg = "#76cce0" }, -- TS variable (soft cyan)
-							["@variable.builtin"] = { fg = "#ff9e64" }, -- e.g., `self`, `this`
+							["@variable"] = { fg = "#7E9CD8" }, -- TreeSitter variable highlighting, this catches ALL variables in syntax trees (object properties, local vars, etc.)
+							["@variable.builtin"] = { fg = "#7FB4CA" }, -- Built-in variables like `this`, `self`
 
 							-- Parameters (fallback for non-LSP files) - orange
-							["@parameter"] = { fg = "#ff9e64" }, -- function params (orange)
-							["@parameter.builtin"] = { fg = "#ff9e64" },
+							["@parameter"] = { fg = "#7FB4CA" }, -- Function parameters in syntax trees
+							["@parameter.builtin"] = { fg = "#7FB4CA" }, -- Built-in parameters
 
 							-- Numbers
 							javaScriptNumber = { fg = "#ff5d62" }, -- Orange (Kanagawa's default number color)
@@ -1122,22 +1138,31 @@ require("lazy").setup({
 							NoiceConfirmBorder = { bg = "NONE" },
 
 							-- 🔹 Swapped Kanagawa Colors
-							-- Constants/readonly variables should be SOFT BLUE (#76cce0)
-							["@lsp.mod.readonly"] = { fg = "#76cce0" }, -- const variables
-							["@lsp.typemod.variable.readonly"] = { fg = "#76cce0" }, -- const variables
+							-- Constants/readonly variables
+							["@lsp.mod.readonly"] = { fg = "#7E9CD8" }, -- const variables
+							["@lsp.typemod.variable.readonly"] = { fg = "#7E9CD8" }, -- const variables
 
-							-- Function parameters should be ORANGE (#ff9e64)
-							["@lsp.type.parameter"] = { fg = "#ff9e64" }, -- function parameters
-							["@lsp.typemod.parameter.declaration"] = { fg = "#ff9e64" }, -- function parameters
+							-- 🔹 BASE COLOR FOR ALL VARIABLES (including let declarations)
+							["@lsp.type.variable"] = { fg = "#B8B4D0" }, -- Base color for all variables
+
+							-- Function parameters
+							["@lsp.type.parameter"] = { fg = "#7FB4CA" },
+							["@lsp.typemod.parameter.declaration"] = { fg = "#7FB4CA" },
+
+							-- Function name
+							["@lsp.type.function"] = { fg = "#FFA066" },
+							["@lsp.typemod.function.declaration"] = { fg = "#FFA066" },
+
+							-- Boolean
+							["Boolean"] = { fg = "#7e9cd8" },
 
 							-- 🔹 BASE TREESITTER SYNTAX HIGHLIGHTING (fallback)
-							-- Variables (object properties, etc.) - soft blue
-							["@variable"] = { fg = "#76cce0" }, -- TS variable (soft cyan)
-							["@variable.builtin"] = { fg = "#ff9e64" }, -- e.g., `self`, `this`
+							["@variable"] = { fg = "#7E9CD8" }, -- TreeSitter variable highlighting, this catches ALL variables in syntax trees (object properties, local vars, etc.)
+							["@variable.builtin"] = { fg = "#7FB4CA" }, -- Built-in variables like `this`, `self`
 
 							-- Parameters (fallback for non-LSP files) - orange
-							["@parameter"] = { fg = "#ff9e64" }, -- function params (orange)
-							["@parameter.builtin"] = { fg = "#ff9e64" },
+							["@parameter"] = { fg = "#7FB4CA" }, -- Function parameters in syntax trees
+							["@parameter.builtin"] = { fg = "#7FB4CA" }, -- Built-in parameters
 
 							-- Numbers
 							javaScriptNumber = { fg = "#ff5d62" }, -- Orange (Kanagawa's default number color)
@@ -1152,43 +1177,6 @@ require("lazy").setup({
 							DiagnosticSignWarn = { bg = "NONE" },
 							DiagnosticSignInfo = { bg = "NONE" },
 							DiagnosticSignHint = { bg = "NONE" },
-
-							-- 🔹 FIX BORDERS AND UI ELEMENTS
-							WinSeparator = { bg = "NONE", fg = "#545c7e" }, -- Window separator lines (|)
-							VertSplit = { bg = "NONE", fg = "#545c7e" }, -- Vertical split lines
-
-							-- Popup menus (completion, etc.)
-							Pmenu = { bg = "NONE", fg = "#c0caf5" }, -- Popup menu background
-							PmenuSel = { bg = "#414868", fg = "#c0caf5" }, -- Selected item (keep subtle bg for visibility)
-							PmenuSbar = { bg = "NONE" }, -- Scrollbar
-							PmenuThumb = { bg = "#545c7e" }, -- Scrollbar thumb
-
-							-- Tab line
-							TabLine = { bg = "NONE", fg = "#545c7e" }, -- Tab line background
-							TabLineSel = { bg = "NONE", fg = "#c0caf5" }, -- Active tab
-							TabLineFill = { bg = "NONE" }, -- Filler space
-
-							-- Window elements
-
-							-- Terminal elements
-							TermCursor = { bg = "#ff9e64", fg = "#1f1f28" }, -- Terminal cursor
-							TermCursorNC = { bg = "#545c7e", fg = "#1f1f28" }, -- Non-active terminal cursor
-
-							-- Wild menu (completion menu)
-							WildMenu = { bg = "NONE", fg = "#bb9af7" }, -- Wild menu
-
-							-- Diagnostic float border
-							DiagnosticFloatBorder = { bg = "NONE", fg = "#545c7e" },
-
-							-- LSP hover border
-							LspFloatWinBorder = { bg = "NONE", fg = "#545c7e" },
-							LspInfoBorder = { bg = "NONE", fg = "#545c7e" },
-
-							-- Telescope borders
-							TelescopeBorder = { bg = "NONE", fg = "#545c7e" },
-							TelescopePromptBorder = { bg = "NONE", fg = "#545c7e" },
-							TelescopeResultsBorder = { bg = "NONE", fg = "#545c7e" },
-							TelescopePreviewBorder = { bg = "NONE", fg = "#545c7e" },
 						}
 					end,
 				})
@@ -1217,31 +1205,48 @@ require("lazy").setup({
 							GitSignsChange = { bg = "NONE" },
 							GitSignsDelete = { bg = "NONE" },
 
-							-- 🔹 Swapped Kanagawa Colors
-							-- Constants/readonly variables should be SOFT BLUE (#76cce0)
-							["@lsp.mod.readonly"] = { fg = "#8ea4a2" }, -- const variables
-							["@lsp.typemod.variable.readonly"] = { fg = "#8ea4a2" }, -- const variables
+							-- Original colors:
+							-- const variable  ORANGE - #B6927B
+							-- let variable DIRTY WHITE - #C5C9C5
+							-- function BLUE - #908bb0
+							-- method LIGHT BLUE - #8EA4A2
+							-- function property GRAY - #A6A69C
+							-- number RED - #8EA4A2
 
-							-- Function parameters should be ORANGE (#ff9e64)
-							["@lsp.type.parameter"] = { fg = "#b6927b" }, -- function parameters
-							["@lsp.typemod.parameter.declaration"] = { fg = "#b6927b" }, -- function parameters
+							-- 🔹 Swapped Kanagawa Colors
+							-- Constants/readonly variables
+							["@lsp.mod.readonly"] = { fg = "#908bb0" }, -- const variables
+							["@lsp.typemod.variable.readonly"] = { fg = "#908bb0" }, -- const variables
+
+							-- 🔹 BASE COLOR FOR ALL VARIABLES (including let declarations)
+							["@lsp.type.variable"] = { fg = "#A6A69C" }, -- Base color for all variables (used for let variables)
+
+							-- Function parameters
+							["@lsp.type.parameter"] = { fg = "#8EA4A2" },
+							["@lsp.typemod.parameter.declaration"] = { fg = "#8EA4A2" },
+
+							-- Function name
+							["@lsp.type.function"] = { fg = "#B6927B" },
+							["@lsp.typemod.function.declaration"] = { fg = "#B6927B" },
+
+							-- Boolean
+							["Boolean"] = { fg = "#908bb0" },
 
 							-- 🔹 BASE TREESITTER SYNTAX HIGHLIGHTING (fallback)
-							-- Variables (object properties, etc.) - soft blue
-							["@variable"] = { fg = "#8ea4a2" }, -- TS variable (soft cyan)
-							["@variable.builtin"] = { fg = "#b6927b" }, -- e.g., `self`, `this`
+							["@variable"] = { fg = "#908bb0" }, -- TreeSitter variable highlighting, this catches ALL variables in syntax trees (object properties, local vars, etc.)
+							["@variable.builtin"] = { fg = "#8EA4A2" }, -- Built-in variables like `this`, `self`
 
 							-- Parameters (fallback for non-LSP files) - orange
-							["@parameter"] = { fg = "#b6927b" }, -- function params (orange)
-							["@parameter.builtin"] = { fg = "#b6927b" },
+							["@parameter"] = { fg = "#8EA4A2" }, -- Function parameters in syntax trees
+							["@parameter.builtin"] = { fg = "#8EA4A2" }, -- Built-in parameters
 
 							-- Numbers
-							javaScriptNumber = { fg = "#a36d6d" }, -- Orange (Kanagawa's default number color)
-							Number = { fg = "#a36d6d" }, -- Base number group
+							javaScriptNumber = { fg = "#B6927B" }, -- Orange (Kanagawa's default number color)
+							Number = { fg = "#8EA4A2" }, -- Base number group
 
 							-- If you want Treesitter/LSP fallbacks too:
-							["@number"] = { fg = "#a36d6d" }, -- Treesitter numbers
-							["@lsp.type.number"] = { fg = "#a36d6d" }, -- LSP semantic tokens
+							["@number"] = { fg = "#8EA4A2" }, -- Treesitter numbers
+							["@lsp.type.number"] = { fg = "#8EA4A2" }, -- LSP semantic tokens
 
 							-- Diagnostic styling
 							DiagnosticSignError = { bg = "NONE" },
@@ -1309,30 +1314,39 @@ require("lazy").setup({
 							NoiceConfirmBorder = { bg = "NONE" },
 
 							-- 🔹 Swapped Kanagawa Colors
-							-- Constants/readonly variables should be SOFT BLUE (#76cce0)
-							["@lsp.mod.readonly"] = { fg = "#8ea4a2" }, -- const variables
-							["@lsp.typemod.variable.readonly"] = { fg = "#8ea4a2" }, -- const variables
+							-- Constants/readonly variables
+							["@lsp.mod.readonly"] = { fg = "#908bb0" }, -- const variables
+							["@lsp.typemod.variable.readonly"] = { fg = "#908bb0" }, -- const variables
 
-							-- Function parameters should be ORANGE (#ff9e64)
-							["@lsp.type.parameter"] = { fg = "#b6927b" }, -- function parameters
-							["@lsp.typemod.parameter.declaration"] = { fg = "#b6927b" }, -- function parameters
+							-- 🔹 BASE COLOR FOR ALL VARIABLES (including let declarations)
+							["@lsp.type.variable"] = { fg = "#A6A69C" }, -- Base color for all variables (used for let variables)
+
+							-- Function parameters
+							["@lsp.type.parameter"] = { fg = "#8EA4A2" },
+							["@lsp.typemod.parameter.declaration"] = { fg = "#8EA4A2" },
+
+							-- Function name
+							["@lsp.type.function"] = { fg = "#B6927B" },
+							["@lsp.typemod.function.declaration"] = { fg = "#B6927B" },
+
+							-- Boolean
+							["Boolean"] = { fg = "#908bb0" },
 
 							-- 🔹 BASE TREESITTER SYNTAX HIGHLIGHTING (fallback)
-							-- Variables (object properties, etc.) - soft blue
-							["@variable"] = { fg = "#8ea4a2" }, -- TS variable (soft cyan)
-							["@variable.builtin"] = { fg = "#b6927b" }, -- e.g., `self`, `this`
+							["@variable"] = { fg = "#908bb0" }, -- TreeSitter variable highlighting, this catches ALL variables in syntax trees (object properties, local vars, etc.)
+							["@variable.builtin"] = { fg = "#8EA4A2" }, -- Built-in variables like `this`, `self`
 
 							-- Parameters (fallback for non-LSP files) - orange
-							["@parameter"] = { fg = "#b6927b" }, -- function params (orange)
-							["@parameter.builtin"] = { fg = "#b6927b" },
+							["@parameter"] = { fg = "#8EA4A2" }, -- Function parameters in syntax trees
+							["@parameter.builtin"] = { fg = "#8EA4A2" }, -- Built-in parameters
 
 							-- Numbers
-							javaScriptNumber = { fg = "#a36d6d" }, -- Orange (Kanagawa's default number color)
-							Number = { fg = "#a36d6d" }, -- Base number group
+							javaScriptNumber = { fg = "#B6927B" }, -- Orange (Kanagawa's default number color)
+							Number = { fg = "#8EA4A2" }, -- Base number group
 
 							-- If you want Treesitter/LSP fallbacks too:
-							["@number"] = { fg = "#a36d6d" }, -- Treesitter numbers
-							["@lsp.type.number"] = { fg = "#a36d6d" }, -- LSP semantic tokens
+							["@number"] = { fg = "#8EA4A2" }, -- Treesitter numbers
+							["@lsp.type.number"] = { fg = "#8EA4A2" }, -- LSP semantic tokens
 
 							-- Diagnostic styling
 							DiagnosticSignError = { bg = "NONE" },
