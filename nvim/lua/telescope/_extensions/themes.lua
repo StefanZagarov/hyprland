@@ -4,6 +4,16 @@ local conf = require("telescope.config").values
 local actions = require("telescope.actions")
 local action_state = require("telescope.actions.state")
 
+-- Color themes (:Telescope themes - to view themes (custom script), :Telescope colorscheme - to view all themes (built-in, no transparent support))
+-- Theme switching:
+--   :Telescope themes        → pick visually
+--   :TokyoNight              → solid background
+--   :TokyoNightTransparent   → native transparency
+--   :Kanagawa                → solid background
+--   :KanagawaTransparent     → native transparency
+--   :KanagawaDragon          → solid background
+--   :KanagawaDragonTransparent → native transparency
+
 local themes = {
 	{ name = "TokyoNight", cmd = "TokyoNight" },
 	{ name = "TokyoNight (Transparent)", cmd = "TokyoNightTransparent" },

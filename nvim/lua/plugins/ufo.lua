@@ -2,6 +2,46 @@ return {
 	"kevinhwang91/nvim-ufo",
 	dependencies = { "kevinhwang91/promise-async" },
 	event = "VeryLazy",
+	keys = {
+		{
+			"zR",
+			function()
+				require("ufo").openAllFolds()
+			end,
+			desc = "Folding: Open all folds",
+		},
+		{
+			"zM",
+			function()
+				require("ufo").closeAllFolds()
+			end,
+			desc = "Folding: Close all folds",
+		},
+		{
+			"zr",
+			function()
+				require("ufo").openFoldsExceptKinds()
+			end,
+			desc = "Folding: Open folds except auto-closed kinds",
+		},
+		{
+			"zm",
+			function()
+				require("ufo").closeFoldsWith(0)
+			end,
+			desc = "Folding: Close all folds (respect foldlevel)",
+		},
+		{
+			"zP",
+			function()
+				local winid = require("ufo").peekFoldedLinesUnderCursor()
+				if not winid then
+					vim.lsp.buf.hover()
+				end
+			end,
+			desc = "Folding: Peek fold or show LSP hover",
+		},
+	},
 	config = function()
 		-- 🔑 REQUIRED: Set global fold options BEFORE setup
 		vim.o.foldcolumn = "0" -- or "1" if you want a fold column
@@ -64,23 +104,5 @@ return {
 		-- Remove folded line background highlight
 		vim.cmd("hi Folded guibg=NONE ctermbg=NONE")
 		vim.cmd("hi FoldColumn guibg=NONE ctermbg=NONE")
-
-		-- Keymaps (all start with 'z' as requested)
-		local map = function(keys, func, desc)
-			vim.keymap.set("n", keys, func, { desc = "Folding: " .. desc })
-		end
-
-		map("zR", require("ufo").openAllFolds, "Open all folds")
-		map("zM", require("ufo").closeAllFolds, "Close all folds")
-		map("zr", require("ufo").openFoldsExceptKinds, "Open folds except auto-closed kinds")
-		map("zm", function()
-			require("ufo").closeFoldsWith(0)
-		end, "Close all folds (respect foldlevel)")
-		map("zP", function()
-			local winid = require("ufo").peekFoldedLinesUnderCursor()
-			if not winid then
-				vim.lsp.buf.hover()
-			end
-		end, "Peek fold or show LSP hover")
 	end,
 }

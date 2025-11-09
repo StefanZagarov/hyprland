@@ -2,6 +2,10 @@ return {
   "nvim-neo-tree/neo-tree.nvim",
   event = "VeryLazy",
   branch = "v3.x",
+  keys = {
+    { "<C-b>", "<cmd>Neotree reveal float<cr>", desc = "Toggle Neo-tree float", silent = true },
+    { "<leader>b", "<cmd>Neotree toggle left<cr>", desc = "Toggle Neo-tree sidebar" },
+  },
   dependencies = {
     "nvim-lua/plenary.nvim",
     "nvim-tree/nvim-web-devicons",
@@ -93,11 +97,5 @@ return {
         },
       },
     })
-    
-    -- Keymaps
-    -- Float (opens at current file's directory)
-    vim.keymap.set('n', '<C-b>', ':Neotree reveal float<CR>', { silent = true, desc = "Toggle Neo-tree float" })
-    -- Sidebar
-    vim.keymap.set('n', '<leader>b', ':Neotree toggle left<CR>', { desc = "Toggle Neo-tree sidebar" })
   end
 }

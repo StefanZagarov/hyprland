@@ -1,6 +1,22 @@
 return {
 	"folke/noice.nvim",
 	event = "VeryLazy", -- Load after startup for better performance
+	keys = {
+		{
+			"<leader>nh",
+			function()
+				require("noice").cmd("history")
+			end,
+			desc = "[N]oice [H]istory",
+		},
+		{
+			"<leader>nm",
+			function()
+				require("noice").cmd("last")
+			end,
+			desc = "[N]oice Last [M]essage",
+		},
+	},
 	dependencies = {
 		"MunifTanjim/nui.nvim", -- Required UI component library
 		"rcarriga/nvim-notify",
