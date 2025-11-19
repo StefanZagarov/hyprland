@@ -48,6 +48,7 @@ return {
 			{ "<leader>t", group = "[T]erminal" },
 			{ "<leader>T", group = "[T]oggle" },
 			{ "<leader>H", group = "Git [H]unk", mode = { "n", "v" } },
+			{ "gC", desc = "Comment (motion)", mode = { "n", "v" } },
 		},
 	},
 }

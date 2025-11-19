@@ -17,7 +17,15 @@ return {
 		-- - sd'   - [S]urround [D]elete [']quotes
 		-- - sr)'  - [S]urround [R]eplace [)] [']
 
-		local comment_opts = {}
+		local comment_opts = {
+			mappings = {
+				-- Disable all default mappings
+				comment = "",
+				comment_line = "",
+				comment_visual = "",
+				textobject = "",
+			},
+		}
 		if pcall(require, "ts_context_commentstring.internal") then
 			comment_opts.options = {
 				custom_commentstring = function()
@@ -27,6 +35,40 @@ return {
 			}
 		end
 		require("mini.comment").setup(comment_opts)
+
+		-- Disable Neovim's built-in commenting (available in Neovim 0.10+)
+		vim.keymap.del("n", "gcc", { silent = true })
+		vim.keymap.del("n", "gc", { silent = true })
+		vim.keymap.del("x", "gc", { silent = true })
+		vim.keymap.del("o", "gc", { silent = true })
+
+		-- Create Mini.comment API reference
+		local MiniComment = require("mini.comment")
+
+		-- gc = instant toggle (normal mode)
+		vim.keymap.set("n", "gc", function()
+			MiniComment.toggle_lines(vim.fn.line("."), vim.fn.line("."))
+		end, { desc = "Toggle comment line", noremap = true, silent = true })
+
+		-- gc = instant toggle (visual mode)
+		vim.keymap.set("v", "gc", function()
+			local esc = vim.api.nvim_replace_termcodes("<Esc>", true, false, true)
+			vim.api.nvim_feedkeys(esc, "nx", false)
+			MiniComment.toggle_lines(vim.fn.line("'<"), vim.fn.line("'>"))
+		end, { desc = "Toggle comment selection", noremap = true, silent = true })
+
+		-- gC = motion-based commenting
+		vim.keymap.set("n", "gC", function()
+			return MiniComment.operator()
+		end, { expr = true, desc = "Comment motion", noremap = true, silent = true })
+
+		-- gC in visual mode = comment selection
+		vim.keymap.set("x", "gC", function()
+			local esc = vim.api.nvim_replace_termcodes("<Esc>", true, false, true)
+			vim.api.nvim_feedkeys(esc, "nx", false)
+			MiniComment.toggle_lines(vim.fn.line("'<"), vim.fn.line("'>"))
+		end, { desc = "Comment selection", noremap = true, silent = true })
+
 		require("mini.surround").setup()
 
 		-- Simple and easy statusline.
