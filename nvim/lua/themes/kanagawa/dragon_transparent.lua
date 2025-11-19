@@ -61,9 +61,11 @@ return {
 					["@lsp.type.parameter"] = { fg = "#8EA4A2" },
 					["@lsp.typemod.parameter.declaration"] = { fg = "#8EA4A2" },
 
-					-- Function name
+					-- Function name (IMPORTANT: These override readonly for functions!)
 					["@lsp.type.function"] = { fg = "#B6927B" },
 					["@lsp.typemod.function.declaration"] = { fg = "#B6927B" },
+					["@lsp.typemod.function.readonly"] = { fg = "#B6927B" }, -- const functions = orange!
+					["@lsp.typemod.function.local"] = { fg = "#B6927B" }, -- local functions = orange!
 
 					-- Boolean
 					["Boolean"] = { fg = "#908bb0" },

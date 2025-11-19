@@ -38,5 +38,6 @@ return {
 		},
 		snippets = { preset = "default" },
 		signature = { enabled = true },
+		fuzzy = { implementation = "prefer_rust_with_warning" }, -- Use Rust fuzzy matcher for better performance
 	},
 }

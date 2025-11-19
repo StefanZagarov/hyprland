@@ -41,12 +41,11 @@ return {
 					["@lsp.type.parameter"] = { fg = "#7FB4CA" },
 					["@lsp.typemod.parameter.declaration"] = { fg = "#7FB4CA" },
 
-					-- 🔑 FIX: SET BASE FUNCTION COLOR IN THEME
-					-- ["@function"] = { fg = "#e09b70" }, -- Base color for ALL functions
-					--
-					-- Function name
+					-- Function name (IMPORTANT: These override readonly for functions!)
 					["@lsp.type.function"] = { fg = "#e09b70" },
 					["@lsp.typemod.function.declaration"] = { fg = "#e09b70" },
+					["@lsp.typemod.function.readonly"] = { fg = "#e09b70" }, -- const functions = orange!
+					["@lsp.typemod.function.local"] = { fg = "#e09b70" }, -- local functions = orange!
 
 					-- Boolean
 					["Boolean"] = { fg = "#7e9cd8" },
