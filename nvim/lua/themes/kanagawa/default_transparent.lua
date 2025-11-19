@@ -63,8 +63,8 @@ return {
 					["@lsp.typemod.parameter.declaration"] = { fg = "#7FB4CA" },
 
 					-- Function name
-					["@lsp.type.function"] = { fg = "#FFA066" },
-					["@lsp.typemod.function.declaration"] = { fg = "#FFA066" },
+					["@lsp.type.function"] = { fg = "#e09b70" },
+					["@lsp.typemod.function.declaration"] = { fg = "#e09b70" },
 
 					-- Boolean
 					["Boolean"] = { fg = "#7e9cd8" },

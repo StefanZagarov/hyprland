@@ -1,0 +1,14 @@
+#!/bin/bash
+# Qwen3-Coder-30B-A3B-Instruct-UD-Q5_K_XL
+
+~/AUR/llama.cpp_ggerganov/llama.cpp/build/bin/llama-server \
+  -m "/home/war/LLM Models/models/unsloth/Qwen3-Coder-30B-A3B-Instruct-GGUF/Qwen3-Coder-30B-A3B-Instruct-UD-Q5_K_XL.gguf" \
+  -ngl 999 \
+  -fa 1 \
+  -c 4096 \
+  -t 8 \
+  -b 512 \
+  --n-predict 4096 \
+  --temp 0.7 \
+  --repeat-penalty 1.1 \
+  --port 8081 \

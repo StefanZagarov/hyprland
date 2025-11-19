@@ -54,4 +54,16 @@ return function()
 	-- Fix paste so cursor lands at end of block
 	vim.keymap.set("n", "p", "p`]", { noremap = true, silent = true })
 	vim.keymap.set("n", "P", "P`]", { noremap = true, silent = true })
+
+	-- Change 'x' to not yank
+	vim.keymap.set("n", "x", '"_x')
+	vim.keymap.set("v", "x", '"_x')
+
+	-- Prevent other common delete commands from yanking
+	vim.keymap.set("n", "dw", '"_dw', { desc = "Delete word without yanking" })
+	-- vim.keymap.set("n", "dd", '"_dd', { desc = "Delete line without yanking" })
+
+	-- Paste over selection without overwriting your register
+	vim.keymap.set("x", "p", [["_dP]], { desc = "Paste without yanking deleted text" })
+	vim.keymap.set("x", "P", [["_dP]], { desc = "Paste without yanking deleted text" })
 end

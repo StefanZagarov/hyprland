@@ -17,6 +17,8 @@ return {
 					GitSignsChange = { bg = "NONE" },
 					GitSignsDelete = { bg = "NONE" },
 
+					FloatBorder = { fg = "#54546D", bg = "#181616" }, -- CRITICAL: set BOTH fg AND bg
+
 					-- Original colors:
 					-- const variable  ORANGE - #B6927B
 					-- let variable DIRTY WHITE - #C5C9C5

@@ -1,0 +1,25 @@
+#!/bin/bash
+# Qwen3-Coder-30B-A3B-Instruct-UD-Q5_K_XL
+
+FILE="$1"
+if [ ! -f "$FILE" ]; then
+  echo "Usage: $0 <file>"
+  exit 1
+fi
+
+~/AUR/llama.cpp_ggerganov/llama.cpp/build/bin/llama-cli \
+  -m "/home/war/LLM Models/models/unsloth/Qwen3-Coder-30B-A3B-Instruct-GGUF/Qwen3-Coder-30B-A3B-Instruct-UD-Q5_K_XL.gguf" \
+  -f "$FILE" \
+  -ngl 999 \
+  -fa 1 \
+  -c 4096 \
+  -t 8 \
+  -b 512 \
+  --n-predict 4096 \
+  --temp 0.7 \
+  --repeat-penalty 1.1 \
+  --color -i \
+  --reverse-prompt "User:" \
+  --in-prefix " " \
+  --in-suffix "Qwen3-Coder:" \
+  -r "User:"
