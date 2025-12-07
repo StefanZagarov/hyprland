@@ -80,7 +80,7 @@ return {
 					["@parameter.builtin"] = { fg = "#7FB4CA" }, -- Built-in parameters
 
 					-- Numbers
-					javaScriptNumber = { fg = "#ff5d62" }, -- Orange (Kanagawa's default number color)
+					javaScriptNumber = { fg = "#ff5d62" }, -- Red
 					Number = { fg = "#ff5d62" }, -- Base number group
 
 					-- If you want Treesitter/LSP fallbacks too:

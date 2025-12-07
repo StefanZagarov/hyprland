@@ -132,11 +132,12 @@ keymap = [
 	{ on = [ "g", "h" ],       run = "cd ~",             desc = "Go home" },
 	{ on = [ "g", "c" ],       run = "cd ~/.config",     desc = "Go ~/.config" },
 	{ on = [ "g", "d" ],       run = "cd ~/Downloads",   desc = "Go ~/Downloads" },
-	{ on = [ "g", "a" ],     run = "cd ~/Arch/Hyprland", desc = "Go to Hyprland config folder" },
+	{ on = [ "g", "a" ],       run = "cd ~/Arch/Hyprland", desc = "Go to Hyprland config folder" },
 	{ on = [ "g", "w" ],       run = "cd ~/Work",        desc = "Go to Work folder" },
     { on =  ["g", "t" ],       run = "cd '~/JavaScript Projects'", desc = "Go to JS Projects folder"},
 	{ on = [ "g", "<Space>" ], run = "cd --interactive", desc = "Jump interactively" },
 	{ on = [ "g", "f" ],       run = "follow",           desc = "Follow hovered symlink" },
+    { on = ["g", "j"],         run = "cd ~/Notes/Programming/JavaScript", desc = "Go to JavaScript notes"},
 
 	# Tabs
 	{ on = "t", run = "tab_create --current", desc = "Create a new tab with CWD" },
