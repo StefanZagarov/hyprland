@@ -66,4 +66,7 @@ return function()
 	-- Paste over selection without overwriting your register
 	vim.keymap.set("x", "p", [["_dP]], { desc = "Paste without yanking deleted text" })
 	vim.keymap.set("x", "P", [["_dP]], { desc = "Paste without yanking deleted text" })
+
+	vim.keymap.set({ "n", "v" }, "c", '"_c', { desc = "Change without yanking" })
+	vim.keymap.set("n", "C", '"_C', { desc = "Change to end of line without yanking" })
 end
