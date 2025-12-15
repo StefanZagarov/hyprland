@@ -1,0 +1,13 @@
+@import "colors.css";
+
+decoration {
+  box-shadow: none;
+  margin: 0;
+}
+
+.window-frame,
+.window-frame:backdrop {
+  box-shadow: none;
+  margin: 0;
+}
+

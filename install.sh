@@ -24,6 +24,11 @@ link_file() {
 
     mkdir -p "$(dirname "$dest")"
 
+    # Remove destination if it exists (file, symlink, or directory)
+    if [ -e "$dest" ] || [ -L "$dest" ]; then
+        rm -rf "$dest"
+    fi
+
      # Link! 
     # -s = symbolic
     # -f = force (delete existing file/link at destination if it exists)
@@ -43,6 +48,11 @@ sudo_link_file() {
     PROCESSED_FILES+=("$name")
 
     sudo mkdir -p "$(dirname "$dest")"
+    
+    # Remove destination if it exists (file, symlink, or directory)
+    if [ -e "$dest" ] || [ -L "$dest" ]; then
+        sudo rm -rf "$dest"
+    fi
     
     if sudo ln -sfn "$src" "$dest"; then
         echo -e "${GREEN}[OK]${NC} Linked $src --> $dest"
@@ -85,7 +95,7 @@ echo "Symlinking custom files..."
 link_file "$REPO_DIR/bin" "$HOME/.local/bin"
 
 # GTK
-link_file "$REPO_DIR/gtk.css" "$CONFIG_DIR/gtk-3.0/gtk.css"
+link_file "$REPO_DIR/gtk-3.0" "$CONFIG_DIR/gtk-3.0"
 
 # Portals
 link_file "$REPO_DIR/portals.conf" "$CONFIG_DIR/xdg-desktop-portal/portals.conf"
