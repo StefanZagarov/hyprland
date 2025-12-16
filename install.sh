@@ -96,6 +96,7 @@ link_file "$REPO_DIR/bin" "$HOME/.local/bin"
 
 # GTK
 link_file "$REPO_DIR/gtk-3.0" "$CONFIG_DIR/gtk-3.0"
+link_file "$REPO_DIR/gtk-4.0" "$CONFIG_DIR/gtk-4.0"
 
 # Portals
 link_file "$REPO_DIR/portals.conf" "$CONFIG_DIR/xdg-desktop-portal/portals.conf"
