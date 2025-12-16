@@ -81,6 +81,7 @@ done
 declare -a HOME_FILES=(
     ".bashrc"
     ".bash_profile"
+    ".bashrc.local"
 )
 
 echo "Symlinking home files..."
