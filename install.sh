@@ -107,6 +107,28 @@ echo "Symlinking keyd..."
 
 sudo_link_file "$REPO_DIR/keyd" "/etc/keyd"
 
+echo "Creating local configuration files (if they don't exist)..."
+
+# Create hypr/config/local.conf if it doesn't exist
+if [ ! -f "$REPO_DIR/hypr/config/local.conf" ]; then
+    cat > "$REPO_DIR/hypr/config/local.conf" << 'EOF'
+
+EOF
+    echo -e "${GREEN}[OK]${NC} Created $REPO_DIR/hypr/config/local.conf"
+else
+    echo -e "${GREEN}[OK]${NC} $REPO_DIR/hypr/config/local.conf already exists"
+fi
+
+# Create .bashrc.local if it doesn't exist
+if [ ! -f "$REPO_DIR/.bashrc.local" ]; then
+    cat > "$REPO_DIR/.bashrc.local" << 'EOF'
+
+EOF
+    echo -e "${GREEN}[OK]${NC} Created $REPO_DIR/.bashrc.local"
+else
+    echo -e "${GREEN}[OK]${NC} $REPO_DIR/.bashrc.local already exists"
+fi
+
 echo "------------------------------------------------"
 echo "Checking for unlinked files in repo..."
 
