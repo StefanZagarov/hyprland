@@ -1,0 +1,25 @@
+#!/bin/bash
+
+# Directory containing ASCII art files
+ASCII_DIR="$HOME/.local/share/ascii-art"
+
+# Check if directory exists
+if [ ! -d "$ASCII_DIR" ]; then
+    echo "Error: ASCII art directory not found at $ASCII_DIR"
+    exit 1
+fi
+
+# Get all .txt files in the directory
+ascii_files=("$ASCII_DIR"/*.txt)
+
+# Check if any files exist
+if [ ! -e "${ascii_files[0]}" ]; then
+    echo "Error: No ASCII art files found in $ASCII_DIR"
+    exit 1
+fi
+
+# Pick a random file
+random_file="${ascii_files[RANDOM % ${#ascii_files[@]}]}"
+
+# Display the selected ASCII art
+cat "$random_file"

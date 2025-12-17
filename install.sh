@@ -12,6 +12,9 @@ HOME_DIR="$HOME"
 # Array to track which files were processed so we can check for missing ones later
 declare -a PROCESSED_FILES
 
+# Track if any operations failed
+INSTALL_FAILED=false
+
 echo "Symlinking files..."
 
 link_file() {
@@ -95,6 +98,9 @@ echo "Symlinking custom files..."
 # Binaries
 link_file "$REPO_DIR/bin" "$HOME/.local/bin"
 
+# ASCII art folder - symlink the entire folder
+link_file "$REPO_DIR/ascii-art" "$HOME/.local/share/ascii-art"
+
 # GTK
 link_file "$REPO_DIR/gtk-3.0" "$CONFIG_DIR/gtk-3.0"
 link_file "$REPO_DIR/gtk-4.0" "$CONFIG_DIR/gtk-4.0"
@@ -103,6 +109,27 @@ link_file "$REPO_DIR/gtk-4.0" "$CONFIG_DIR/gtk-4.0"
 link_file "$REPO_DIR/portals.conf" "$CONFIG_DIR/xdg-desktop-portal/portals.conf"
 
 link_file "$REPO_DIR/override.conf" "$CONFIG_DIR/systemd/user/xdg-desktop-portal-gtk.service.d/override.conf"
+
+echo "Setting up login ASCII art..."
+
+# Create issue.d directory if it doesn't exist
+sudo mkdir -p /etc/issue.d
+
+# Check if login-ascii exists before using it
+LOGIN_ASCII_PATH="$HOME/.local/share/ascii-art/login-ascii"
+if [ ! -f "$LOGIN_ASCII_PATH" ]; then
+    echo -e "${RED}[FAIL]${NC} login-ascii not found at $LOGIN_ASCII_PATH"
+    echo -e "${RED}[FAIL]${NC} Make sure ascii-art folder was linked successfully"
+    INSTALL_FAILED=true
+else
+    # Generate the ASCII art and save it to tty1.issue
+    if "$LOGIN_ASCII_PATH" | sudo tee /etc/issue.d/tty1.issue > /dev/null; then
+        echo -e "${GREEN}[OK]${NC} Created /etc/issue.d/tty1.issue"
+    else
+        echo -e "${RED}[FAIL]${NC} Error creating /etc/issue.d/tty1.issue"
+        INSTALL_FAILED=true
+    fi
+fi
 
 echo "Symlinking keyd..."
 
@@ -162,6 +189,14 @@ done
 
 if [ "$found_unlinked" = false ]; then
     echo -e "${GREEN}All repo files are successfully accounted for!${NC}"
+fi
+
+echo "------------------------------------------------"
+if [ "$INSTALL_FAILED" = true ]; then
+    echo -e "${RED}Installation completed with errors. Please review the output above.${NC}"
+    exit 1
+else
+    echo -e "${GREEN}Installation completed successfully!${NC}"
 fi
 
 echo "Done!"
