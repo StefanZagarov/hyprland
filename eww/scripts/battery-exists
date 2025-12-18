@@ -1,0 +1,12 @@
+#!/bin/bash
+# Check if battery exists
+# Returns "true" if battery exists, "false" otherwise
+
+BATTERY_PATH="/sys/class/power_supply/BAT0"
+
+if [ -d "$BATTERY_PATH" ]; then
+    echo "true"
+else
+    echo "false"
+fi
+

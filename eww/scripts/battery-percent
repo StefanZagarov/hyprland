@@ -1,0 +1,13 @@
+#!/bin/bash
+# Get battery percentage only (for eww display)
+
+BATTERY_PATH="/sys/class/power_supply/BAT0"
+
+if [ ! -d "$BATTERY_PATH" ]; then
+    echo "N/A"
+    exit 0
+fi
+
+CAPACITY=$(cat "$BATTERY_PATH/capacity" 2>/dev/null || echo "0")
+echo "${CAPACITY}%"
+

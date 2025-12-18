@@ -21,6 +21,7 @@
       (cpu-temp)
       (fan-speed)
       (memory)
+      (battery)
       (volume)
       (power))))
 
@@ -81,6 +82,19 @@
        :space-evenly false
     (label :class "memory-icon" :text "")
     (label :class "memory-value" :text "${memory-data}GB")))
+
+;; Battery widget with script updates
+(defpoll battery-icon :interval "2s" :initial "󰁹" "~/Arch/Hyprland/eww/scripts/battery")
+(defpoll battery-percent :interval "2s" :initial "N/A" "~/Arch/Hyprland/eww/scripts/battery-percent")
+(defpoll battery-exists :interval "999999s" :initial "false" "~/Arch/Hyprland/eww/scripts/battery-exists")
+
+(defwidget battery []
+  (box :class "battery module-group"
+       :orientation "horizontal"
+       :space-evenly false
+       :visible "${battery-exists == 'true'}"
+    (label :class "battery-icon" :text "${battery-icon}")
+    (label :class "battery-value" :text "${battery-percent}")))
 
 ;; Volume widget with script updates
 (deflisten volume-data :initial "0" "~/Arch/Hyprland/eww/scripts/volume-listen")

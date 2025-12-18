@@ -1,10 +1,53 @@
 #!/bin/bash
-# Get CPU fan speed percentage (same logic as waybar)
-sensors | grep 'CPU Fan:' | awk '{ 
-    current=$3; 
-    min=335; 
-    max=1780; 
-    if (current < min) current=min; 
-    percentage=((current - min) / (max - min)) * 100; 
-    print int(percentage) 
-}' 
+# Get CPU fan speed percentage
+# First try: sensors command (for desktop PCs)
+# Fallback: Read from hwmon (for laptops)
+
+# Try sensors command first (try both "CPU Fan:" and "cpu_fan" formats)
+cpu_fan_rpm=$(sensors 2>/dev/null | grep -iE '(CPU Fan:|cpu_fan)' | awk '{print $NF}' | sed 's/RPM//' | tr -d ' ' | head -1)
+if [ -n "$cpu_fan_rpm" ] && [ "$cpu_fan_rpm" != "0" ]; then
+    # Desktop PC calculation (min=335, max=1780)
+    min=335
+    max=1780
+    current=$cpu_fan_rpm
+    if [ "$current" -lt "$min" ]; then
+        current=$min
+    fi
+    percentage=$(( (current - min) * 100 / (max - min) ))
+    echo "$percentage"
+    exit 0
+fi
+
+# Fallback: Read from hwmon (laptop)
+# Try hwmon4 (asus) - CPU fan is usually fan1 or fan2
+if [ -f /sys/class/hwmon/hwmon4/fan1_input ]; then
+    fan_rpm=$(cat /sys/class/hwmon/hwmon4/fan1_input 2>/dev/null)
+    if [ -n "$fan_rpm" ] && [ "$fan_rpm" != "0" ]; then
+        # Laptop fan calculation (ASUS ROG Strix SCAR 18 CPU fan max = 6300 RPM - measured)
+        # Maximum observed: cpu_fan = 6300 RPM, gpu_fan = 5700 RPM, mid_fan = 7000 RPM
+        max=6300
+        percentage=$(( fan_rpm * 100 / max ))
+        if [ "$percentage" -gt 100 ]; then
+            percentage=100
+        fi
+        echo "$percentage"
+        exit 0
+    fi
+fi
+
+# Try hwmon1 (acpi_fan) as last resort
+if [ -f /sys/class/hwmon/hwmon1/fan1_input ]; then
+    fan_rpm=$(cat /sys/class/hwmon/hwmon1/fan1_input 2>/dev/null)
+    if [ -n "$fan_rpm" ] && [ "$fan_rpm" != "0" ]; then
+        max=6300
+        percentage=$(( fan_rpm * 100 / max ))
+        if [ "$percentage" -gt 100 ]; then
+            percentage=100
+        fi
+        echo "$percentage"
+        exit 0
+    fi
+fi
+
+# If all fail
+echo "0" 

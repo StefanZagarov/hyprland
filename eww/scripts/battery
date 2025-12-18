@@ -1,0 +1,20 @@
+#!/bin/bash
+# Get battery icon (for eww display)
+# Returns just the icon character based on charging status
+
+BATTERY_PATH="/sys/class/power_supply/BAT0"
+
+if [ ! -d "$BATTERY_PATH" ]; then
+    echo "󰁹"
+    exit 0
+fi
+
+STATUS=$(cat "$BATTERY_PATH/status" 2>/dev/null || echo "Unknown")
+
+# Choose icon based on status
+if [ "$STATUS" = "Charging" ]; then
+    echo "⚡"  # Charging bolt/lightning
+else
+    echo "󰁹"  # Regular battery icon
+fi
+

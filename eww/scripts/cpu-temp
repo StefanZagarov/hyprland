@@ -1,8 +1,60 @@
 #!/bin/bash
-# Get CPU temperature from hwmon5 (same as waybar config)
+# Get CPU temperature - try multiple sources
+# First try hwmon5 (asus_custom_fan_curve), then fallback to hwmon11 (coretemp)
+
+# Try hwmon5 first
 if [ -f /sys/class/hwmon/hwmon5/temp1_input ]; then
     temp=$(cat /sys/class/hwmon/hwmon5/temp1_input)
-    echo $((temp / 1000))
-else
-    echo "N/A"
-fi 
+    if [ -n "$temp" ] && [ "$temp" != "0" ]; then
+        echo $((temp / 1000))
+        exit 0
+    fi
+fi
+
+# Fallback to hwmon11 (coretemp) - find hottest core (hotspot)
+if [ -d /sys/class/hwmon/hwmon11 ]; then
+    max_temp=0
+    for label_file in /sys/class/hwmon/hwmon11/temp*_label; do
+        if [ -f "$label_file" ] && grep -q "^Core" "$label_file" 2>/dev/null; then
+            temp_file=$(echo "$label_file" | sed 's/_label$/_input/')
+            if [ -f "$temp_file" ]; then
+                temp=$(cat "$temp_file" 2>/dev/null)
+                if [ -n "$temp" ] && [ "$temp" != "0" ]; then
+                    temp_c=$((temp / 1000))
+                    if [ "$temp_c" -gt "$max_temp" ]; then
+                        max_temp=$temp_c
+                    fi
+                fi
+            fi
+        fi
+    done
+    if [ "$max_temp" -gt 0 ]; then
+        echo "$max_temp"
+        exit 0
+    fi
+    # If no cores found, fallback to package temperature
+    if [ -f /sys/class/hwmon/hwmon11/temp1_input ]; then
+        temp=$(cat /sys/class/hwmon/hwmon11/temp1_input)
+        if [ -n "$temp" ] && [ "$temp" != "0" ]; then
+            echo $((temp / 1000))
+            exit 0
+        fi
+    fi
+fi
+
+# If both fail, try to find any coretemp device
+for hwmon in /sys/class/hwmon/hwmon*/name; do
+    if [ -f "$hwmon" ] && grep -q "coretemp" "$hwmon" 2>/dev/null; then
+        hwmon_dir=$(dirname "$hwmon")
+        if [ -f "$hwmon_dir/temp1_input" ]; then
+            temp=$(cat "$hwmon_dir/temp1_input")
+            if [ -n "$temp" ] && [ "$temp" != "0" ]; then
+                echo $((temp / 1000))
+                exit 0
+            fi
+        fi
+    fi
+done
+
+# If all else fails
+echo "N/A" 
