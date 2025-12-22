@@ -1,0 +1,41 @@
+#!/bin/bash
+
+# Notification ID (prevents spamming new bubbles)
+NOTIFY_ID=9999
+
+set_mode() {
+    case $1 in
+        silent)
+            powerprofilesctl set power-saver
+            # Force Boost OFF
+            echo "1" | sudo tee /sys/devices/system/cpu/intel_pstate/no_turbo
+            notify-send -u low -r $NOTIFY_ID "G-Helper" "  SILENT (No Boost)"
+            ;;
+        balanced)
+            powerprofilesctl set balanced
+            # Force Boost ON
+            echo "0" | sudo tee /sys/devices/system/cpu/intel_pstate/no_turbo
+            notify-send -u low -r $NOTIFY_ID "G-Helper" "  BALANCED"
+            ;;
+        turbo)
+            powerprofilesctl set performance
+            # Force Boost ON
+            echo "0" | sudo tee /sys/devices/system/cpu/intel_pstate/no_turbo
+            notify-send -u low -r $NOTIFY_ID "G-Helper" "  TURBO (Max Power)"
+            ;;
+    esac
+}
+
+# Cycle Logic (If no argument passed)
+if [ -z "$1" ]; then
+    CURRENT=$(powerprofilesctl get)
+    if [ "$CURRENT" == "power-saver" ]; then
+        set_mode balanced
+    elif [ "$CURRENT" == "balanced" ]; then
+        set_mode turbo
+    else
+        set_mode silent
+    fi
+else
+    set_mode $1
+fi
