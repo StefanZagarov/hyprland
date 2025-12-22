@@ -172,7 +172,7 @@ if [[ -n "$selected_index" ]]; then
         
         # Route to appropriate handler using cached result or fallback
         if [[ "$is_img_cached" == "1" ]] || { [[ -z "$is_img_cached" ]] && is_image "$content"; }; then
-            ~/.local/bin/cliphist-rofi-img "$id" "$content"
+            "$(dirname "$0")/cliphist-rofi-img" "$id" "$content"
         else
             echo -n "$id" | cliphist decode | wl-copy
             echo "$id" | cliphist delete

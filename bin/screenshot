@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Take screenshot with area selection
-screenshot_path="/home/war/Pictures/Screenshots/screenshot-$(date +%F-%T).png"
+screenshot_path="$HOME/Pictures/Screenshots/screenshot-$(date +%F-%T).png"
 grim -g "$(slurp)" "$screenshot_path"
 
 # Check if screenshot was actually taken (user didn't cancel)

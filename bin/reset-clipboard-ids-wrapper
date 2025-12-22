@@ -3,7 +3,7 @@
 # Wrapper script for reset-clipboard-ids with logging for debugging exec-once issues
 
 LOG_FILE="/tmp/reset-clipboard-ids.log"
-SCRIPT_DIR="/home/war/Arch/Hyprland/bin"
+SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
 
 # Create log with timestamp
 echo "$(date): Starting reset-clipboard-ids wrapper" >> "$LOG_FILE"

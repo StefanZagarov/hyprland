@@ -28,8 +28,14 @@ link_file() {
     mkdir -p "$(dirname "$dest")"
 
     # Remove destination if it exists (file, symlink, or directory)
-    if [ -e "$dest" ] || [ -L "$dest" ]; then
-        rm -rf "$dest"
+    # Safety checks: ensure dest is not empty and not a critical path
+    if [ -n "$dest" ] && [ "$dest" != "/" ] && [ "$dest" != "$HOME" ] && [ "$dest" != "/home" ]; then
+        if [ -e "$dest" ] || [ -L "$dest" ]; then
+            rm -rf "$dest"
+        fi
+    elif [ -z "$dest" ]; then
+        echo -e "${RED}[ERROR]${NC} Destination path is empty, skipping rm"
+        return 1
     fi
 
      # Link! 
@@ -51,10 +57,16 @@ sudo_link_file() {
     PROCESSED_FILES+=("$name")
 
     sudo mkdir -p "$(dirname "$dest")"
-    
+
     # Remove destination if it exists (file, symlink, or directory)
-    if [ -e "$dest" ] || [ -L "$dest" ]; then
-        sudo rm -rf "$dest"
+    # Safety checks: ensure dest is not empty and not a critical path
+    if [ -n "$dest" ] && [ "$dest" != "/" ] && [ "$dest" != "$HOME" ] && [ "$dest" != "/home" ]; then
+        if [ -e "$dest" ] || [ -L "$dest" ]; then
+            sudo rm -rf "$dest"
+        fi
+    elif [ -z "$dest" ]; then
+        echo -e "${RED}[ERROR]${NC} Destination path is empty, skipping rm"
+        return 1
     fi
     
     if sudo ln -sfn "$src" "$dest"; then
