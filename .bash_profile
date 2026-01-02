@@ -10,5 +10,5 @@ export EDITOR=nvim
 
 # Autostart Hyprland silently on TTY1
 if [ -z "$DISPLAY" ] && [ "$(tty)" = "/dev/tty1" ]; then
-    exec Hyprland > /dev/null 2>&1
+    exec start-hyprland > /dev/null 2>&1
 fi

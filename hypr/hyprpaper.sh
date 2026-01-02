@@ -30,14 +30,25 @@ if [ -z "$MONITORS" ]; then
     exit 1
 fi
 
-# Build config: preload once, then one wallpaper line per monitor
+# --- START OF NEW CONFIG GENERATION ---
+# Build config with new block syntax
 {
-    echo "preload = $WALLPAPER"
+    echo "ipc = true"
+    echo ""
+
+    # Iterate over monitors and create a block for each
     echo "$MONITORS" | while IFS= read -r mon; do
-        [ -n "$mon" ] && echo "wallpaper = $mon,$WALLPAPER"
+        if [ -n "$mon" ]; then
+            echo "wallpaper {"
+            echo "    monitor = $mon"
+            echo "    path = $WALLPAPER"
+            echo "    fit_mode = cover"
+            echo "}"
+            echo ""
+        fi
     done
-    echo "unload = true"
 } > "$CONFIG"
+# --- END OF NEW CONFIG GENERATION ---
 
 # Validate config was created
 if [ ! -s "$CONFIG" ]; then
@@ -45,5 +56,6 @@ if [ ! -s "$CONFIG" ]; then
     exit 1
 fi
 
-# Launch hyprpaper
+# Kill existing instance to ensure the new config is read, then start fresh
+killall hyprpaper 2>/dev/null
 exec hyprpaper
