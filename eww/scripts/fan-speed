@@ -4,7 +4,7 @@
 # Fallback: Read from hwmon (for laptops)
 
 # Try sensors command first (try both "CPU Fan:" and "cpu_fan" formats)
-cpu_fan_rpm=$(sensors 2>/dev/null | grep -iE '(CPU Fan:|cpu_fan)' | awk '{print $NF}' | sed 's/RPM//' | tr -d ' ' | head -1)
+cpu_fan_rpm=$(sensors 2>/dev/null | grep -iE '(CPU Fan:|cpu_fan)' | awk '{print $3}' | head -1)
 if [ -n "$cpu_fan_rpm" ] && [ "$cpu_fan_rpm" != "0" ]; then
     # Desktop PC calculation (min=335, max=1780)
     min=335
