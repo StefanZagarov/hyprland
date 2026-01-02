@@ -1,40 +1,41 @@
 #!/bin/bash
+# A G-Helper-style mode switcher - v2 (Corrected Logic & Sudo)
 
-# Notification ID (prevents spamming new bubbles)
+# Notification ID
 NOTIFY_ID=9999
 
 set_mode() {
+    # We now call sudo here, which will be handled by the sudoers file
     case $1 in
-        silent)
-            powerprofilesctl set power-saver
-            # Force Boost OFF
-            echo "1" | sudo tee /sys/devices/system/cpu/intel_pstate/no_turbo
-            notify-send -u low -r $NOTIFY_ID "G-Helper" "  SILENT (No Boost)"
+        Quiet)
+            sudo asusctl profile -P Quiet
+            echo "1" | sudo tee /sys/devices/system/cpu/intel_pstate/no_turbo > /dev/null
+            notify-send -u low -r $NOTIFY_ID "Mode Control" "  Quiet"
             ;;
-        balanced)
-            powerprofilesctl set balanced
-            # Force Boost ON
-            echo "0" | sudo tee /sys/devices/system/cpu/intel_pstate/no_turbo
-            notify-send -u low -r $NOTIFY_ID "G-Helper" "  BALANCED"
+        Balanced)
+            sudo asusctl profile -P Balanced
+            echo "0" | sudo tee /sys/devices/system/cpu/intel_pstate/no_turbo > /dev/null
+            notify-send -u low -r $NOTIFY_ID "Mode Control" "  Balanced"
             ;;
-        turbo)
-            powerprofilesctl set performance
-            # Force Boost ON
-            echo "0" | sudo tee /sys/devices/system/cpu/intel_pstate/no_turbo
-            notify-send -u low -r $NOTIFY_ID "G-Helper" "  TURBO (Max Power)"
+        Performance)
+            sudo asusctl profile -P Performance
+            echo "0" | sudo tee /sys/devices/system/cpu/intel_pstate/no_turbo > /dev/null
+            notify-send -u low -r $NOTIFY_ID "Mode Control" "  Performance"
             ;;
     esac
 }
 
-# Cycle Logic (If no argument passed)
+# --- Cycle Logic (Updated with a more robust check) ---
 if [ -z "$1" ]; then
-    CURRENT=$(powerprofilesctl get)
-    if [ "$CURRENT" == "power-saver" ]; then
-        set_mode balanced
-    elif [ "$CURRENT" == "balanced" ]; then
-        set_mode turbo
+    # This command is less fragile and directly extracts the profile name
+    CURRENT=$(asusctl profile -p | grep -o -E 'Quiet|Balanced|Performance' | head -n 1)
+    
+    if [ "$CURRENT" == "Quiet" ]; then
+        set_mode Balanced
+    elif [ "$CURRENT" == "Balanced" ]; then
+        set_mode Performance
     else
-        set_mode silent
+        set_mode Quiet
     fi
 else
     set_mode $1
