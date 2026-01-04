@@ -19,4 +19,5 @@ pdf = [
 [open]
 prepend_rules = [
 	{ mime = "image/*", use = [ "image" ] },
+    { mime = "application/pdf", use = [ "pdf" ] },
 ]
