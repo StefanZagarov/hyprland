@@ -11,4 +11,12 @@ prepend_keymap = [
     { on = "n", run = "shell '~/.local/bin/yazi-to-neovim \"$PWD\"'",  desc = "Open Neovim in current directory, closes Yazi" },
     # Custom: Open Neovim in new Alacritty without closing Yazi
     { on = "N", run = "shell -- setsid alacritty --working-directory . -e nvim .",  desc = "Open Neovim in current directory without closing Yazi" },
+
+    # Custom: Go to JavaScript Projects folder
+    { on = [ "g", "n" ], run = 'cd "/home/war/Notes"', desc = "Go to Notes" },
+    { on = [ "g", "t" ], run = 'cd "/home/war/JavaScript Projects"', desc = "Go to JavaScript Projects" },
+    # Custom: Go to Work folder
+    { on = [ "g", "w" ], run = 'cd "~/Work"', desc = "Go to Work" },
+    # Custom: Go to Notes/Programming/Javascript folder
+    { on = [ "g", "j" ], run = 'cd "/home/war/Notes/Programming/JavaScript"', desc = "Go to Programming Notes (Javascript)" },
 ]

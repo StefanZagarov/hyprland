@@ -1,3 +1,4 @@
 # Ignore machine-specific configuration files
 hypr/config/local.conf
 .bashrc.local
+.claude

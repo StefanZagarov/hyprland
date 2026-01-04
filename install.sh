@@ -179,7 +179,7 @@ for item in "$REPO_DIR"/* "$REPO_DIR"/.*; do
     name=$(basename "$item")
 
     # Skip .git, current dir, parent dir, and the script itself
-    if [[ "$name" == "." || "$name" == ".." || "$name" == ".git" || "$name" == ".gitignore" || "$name" == "install.sh" || "$name" == "README.md" || "$name" == "test.sh" ]]; then
+    if [[ "$name" == "." || "$name" == ".." || "$name" == ".git" || "$name" == ".gitignore" || "$name" == "install.sh" || "$name" == "README.md" || "$name" == "test.sh" || "$name" == ".claude" ]]; then
         continue
     fi
 
