@@ -38,3 +38,8 @@ hide_when_typing= true
 
 [keyboard]
 bindings= [{key= "Return", mods= "Super|Shift", action= "SpawnNewInstance"}]
+
+# [[keyboard.bindings]]
+# key = "Return"
+# mods = "Shift"
+# chars = "\x1b\r"

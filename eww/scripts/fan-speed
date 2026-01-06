@@ -1,9 +1,52 @@
 #!/bin/bash
 # Get CPU fan speed percentage
-# First try: sensors command (for desktop PCs)
-# Fallback: Read from hwmon (for laptops)
+# Check if laptop or desktop first, then use appropriate method
 
-# Try sensors command first (try both "CPU Fan:" and "cpu_fan" formats)
+# Check if this is a laptop (chassis_type 9, 10, or 14 = laptop/notebook)
+chassis_type=$(cat /sys/class/dmi/id/chassis_type 2>/dev/null)
+is_laptop=false
+if [[ "$chassis_type" =~ ^(9|10|14)$ ]] || [ -d /sys/class/power_supply/BAT0 ]; then
+    is_laptop=true
+fi
+
+# LAPTOP: Read from hwmon (skip sensors entirely)
+if [ "$is_laptop" = true ]; then
+    # Try hwmon4 (asus) - CPU fan is usually fan1 or fan2
+    if [ -f /sys/class/hwmon/hwmon4/fan1_input ]; then
+        fan_rpm=$(cat /sys/class/hwmon/hwmon4/fan1_input 2>/dev/null)
+        if [ -n "$fan_rpm" ] && [ "$fan_rpm" != "0" ]; then
+            # Laptop fan calculation (ASUS ROG Strix SCAR 18 CPU fan max = 6300 RPM - measured)
+            # Maximum observed: cpu_fan = 6300 RPM, gpu_fan = 5700 RPM, mid_fan = 7000 RPM
+            max=6300
+            percentage=$(( fan_rpm * 100 / max ))
+            if [ "$percentage" -gt 100 ]; then
+                percentage=100
+            fi
+            echo "$percentage"
+            exit 0
+        fi
+    fi
+
+    # Try hwmon1 (acpi_fan) as last resort for laptop
+    if [ -f /sys/class/hwmon/hwmon1/fan1_input ]; then
+        fan_rpm=$(cat /sys/class/hwmon/hwmon1/fan1_input 2>/dev/null)
+        if [ -n "$fan_rpm" ] && [ "$fan_rpm" != "0" ]; then
+            max=6300
+            percentage=$(( fan_rpm * 100 / max ))
+            if [ "$percentage" -gt 100 ]; then
+                percentage=100
+            fi
+            echo "$percentage"
+            exit 0
+        fi
+    fi
+
+    # If laptop fan reading fails, return 0
+    echo "0"
+    exit 0
+fi
+
+# DESKTOP PC: Try sensors command (try both "CPU Fan:" and "cpu_fan" formats)
 cpu_fan_rpm=$(sensors 2>/dev/null | grep -iE '(CPU Fan:|cpu_fan)' | awk '{print $3}' | head -1)
 if [ -n "$cpu_fan_rpm" ] && [ "$cpu_fan_rpm" != "0" ]; then
     # Desktop PC calculation (min=335, max=1780)
@@ -18,36 +61,5 @@ if [ -n "$cpu_fan_rpm" ] && [ "$cpu_fan_rpm" != "0" ]; then
     exit 0
 fi
 
-# Fallback: Read from hwmon (laptop)
-# Try hwmon4 (asus) - CPU fan is usually fan1 or fan2
-if [ -f /sys/class/hwmon/hwmon4/fan1_input ]; then
-    fan_rpm=$(cat /sys/class/hwmon/hwmon4/fan1_input 2>/dev/null)
-    if [ -n "$fan_rpm" ] && [ "$fan_rpm" != "0" ]; then
-        # Laptop fan calculation (ASUS ROG Strix SCAR 18 CPU fan max = 6300 RPM - measured)
-        # Maximum observed: cpu_fan = 6300 RPM, gpu_fan = 5700 RPM, mid_fan = 7000 RPM
-        max=6300
-        percentage=$(( fan_rpm * 100 / max ))
-        if [ "$percentage" -gt 100 ]; then
-            percentage=100
-        fi
-        echo "$percentage"
-        exit 0
-    fi
-fi
-
-# Try hwmon1 (acpi_fan) as last resort
-if [ -f /sys/class/hwmon/hwmon1/fan1_input ]; then
-    fan_rpm=$(cat /sys/class/hwmon/hwmon1/fan1_input 2>/dev/null)
-    if [ -n "$fan_rpm" ] && [ "$fan_rpm" != "0" ]; then
-        max=6300
-        percentage=$(( fan_rpm * 100 / max ))
-        if [ "$percentage" -gt 100 ]; then
-            percentage=100
-        fi
-        echo "$percentage"
-        exit 0
-    fi
-fi
-
-# If all fail
+# If desktop PC fan reading fails
 echo "0" 
