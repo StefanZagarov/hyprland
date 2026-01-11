@@ -20,5 +20,5 @@ fi
 if [[ "$is_crash_state" == "true" ]]; then
     hyprctl dispatch hy3:changegroup untab
 else
-    hyprctl dispatch hy3:makegroup tab,toggle,force_ephemeral
+    hyprctl dispatch hy3:makegroup tab,toggle
 fi
