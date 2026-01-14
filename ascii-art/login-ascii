@@ -22,4 +22,6 @@ fi
 random_file="${ascii_files[RANDOM % ${#ascii_files[@]}]}"
 
 # Display the selected ASCII art
-cat "$random_file"
+sed 's/\\/\\\\/g' "$random_file"
+# Test specific file
+# sed 's/\\/\\\\/g' "${ascii_files[0]}"
