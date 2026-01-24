@@ -1,42 +1,50 @@
 #!/bin/bash
-# A G-Helper-style mode switcher - v2 (Corrected Logic & Sudo)
-
+# A G-Helper-style mode switcher - v3 (Updated for new asusctl)
 # Notification ID
 NOTIFY_ID=9999
 
 set_mode() {
-    # We now call sudo here, which will be handled by the sudoers file
     case $1 in
         Quiet)
-            sudo asusctl profile -P Quiet
+            sudo asusctl profile set Quiet
             echo "1" | sudo tee /sys/devices/system/cpu/intel_pstate/no_turbo > /dev/null
-            notify-send -u low -r $NOTIFY_ID "Mode Control" "  Quiet"
+            notify-send -u low -r $NOTIFY_ID "Mode Control" "󰌪  Quiet"
             ;;
         Balanced)
-            sudo asusctl profile -P Balanced
+            sudo asusctl profile set Balanced
             echo "0" | sudo tee /sys/devices/system/cpu/intel_pstate/no_turbo > /dev/null
             notify-send -u low -r $NOTIFY_ID "Mode Control" "  Balanced"
             ;;
         Performance)
-            sudo asusctl profile -P Performance
+            sudo asusctl profile set Performance
             echo "0" | sudo tee /sys/devices/system/cpu/intel_pstate/no_turbo > /dev/null
             notify-send -u low -r $NOTIFY_ID "Mode Control" "  Performance"
             ;;
     esac
 }
 
-# --- Cycle Logic (Updated with a more robust check) ---
+# --- Cycle Logic ---
 if [ -z "$1" ]; then
-    # This command is less fragile and directly extracts the profile name
-    CURRENT=$(asusctl profile -p | grep -o -E 'Quiet|Balanced|Performance' | head -n 1)
+    # Get current profile - extract from "Active profile: X" line
+    CURRENT=$(asusctl profile get | grep "Active profile:" | awk '{print $3}')
     
-    if [ "$CURRENT" == "Quiet" ]; then
+    if [ -z "$CURRENT" ]; then
+        echo "Warning: Could not detect current profile" >&2
         set_mode Balanced
-    elif [ "$CURRENT" == "Balanced" ]; then
-        set_mode Performance
-    else
-        set_mode Quiet
+        exit 0
     fi
+    
+    case "$CURRENT" in
+        Quiet)
+            set_mode Balanced
+            ;;
+        Balanced)
+            set_mode Performance
+            ;;
+        Performance)
+            set_mode Quiet
+            ;;
+    esac
 else
-    set_mode $1
+    set_mode "$1"
 fi

@@ -45,6 +45,7 @@ fi
             echo "    fit_mode = cover"
             echo "}"
             echo ""
+            echo "splash = false"
         fi
     done
 } > "$CONFIG"
