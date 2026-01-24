@@ -8,6 +8,7 @@ return {
                 "markdown", "markdown_inline", "query", "vim",
                 "vimdoc", "javascript", "typescript", "tsx",
                 "json", "css", "regex", "vue", "scss", "yaml",
+                "python",
             },
             auto_install = true,
             highlight = {

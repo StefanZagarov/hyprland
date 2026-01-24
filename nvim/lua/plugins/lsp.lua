@@ -213,7 +213,6 @@ return {
 		local servers = {
 			-- clangd = {},
 			-- gopls = {},
-			-- pyright = {},
 			-- rust_analyzer = {},
 			-- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
 			--
@@ -222,7 +221,23 @@ return {
 			--
 			-- But for many setups, the LSP (`ts_ls`) will work just fine
 			-- ts_ls = {},
-			--
+
+			-- Python: basedpyright for type checking + ruff for linting
+			basedpyright = {
+				settings = {
+					basedpyright = {
+						analysis = {
+							typeCheckingMode = "standard",
+							autoImportCompletions = true,
+							diagnosticSeverityOverrides = {
+								reportUnusedImport = "information",
+								reportUnusedVariable = "information",
+							},
+						},
+					},
+				},
+			},
+			ruff = {}, -- Fast Python linter as LSP
 
 			lua_ls = {
 				-- cmd = { ... },
@@ -303,6 +318,7 @@ return {
 			"stylua", -- Used to format Lua code
 			"prettier", -- JS/TS/HTML/CSS formatter
 			"eslint_d", -- Fast ESLint daemon
+			"ruff", -- Python linter/formatter
 		})
 		require("mason-tool-installer").setup({ ensure_installed = ensure_installed })
 
