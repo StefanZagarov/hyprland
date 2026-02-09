@@ -1,14 +1,15 @@
 #!/bin/bash
 EWW_WINDOW="keybinds_overlay"
-CONFIG_FILE="$HOME/.config/hypr/config/hotkeys.conf"
+CONFIG_DIR="$HOME/.config/hypr/config"
+CONFIG_FILES=("$CONFIG_DIR"/hotkeys-*.conf)
 
-[[ -f $CONFIG_FILE ]] || { notify-send "Keybinds" "Config not found"; exit 1; }
+[[ ${#CONFIG_FILES[@]} -gt 0 ]] || { notify-send "Keybinds" "No hotkey configs found"; exit 1; }
 
 if eww active-windows | grep -q "$EWW_WINDOW"; then
     eww close "$EWW_WINDOW"
 else
     # Process config and build grouped JSON
-    sed -n '/^[[:space:]]*bind.*# DESC:/p' "$CONFIG_FILE" | 
+    cat "${CONFIG_FILES[@]}" | sed -n '/^[[:space:]]*bind.*# DESC:/p' |
     awk '
     BEGIN {
         print "[";
