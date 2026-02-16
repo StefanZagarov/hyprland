@@ -62,6 +62,7 @@ return {
 			-- true = bordered, false = borderless
 			lsp_doc_border = true,
 		},
+		-- cmdline = {enabled = false},
 		views = {
 			mini = {
 				-- Backend determines rendering engine
