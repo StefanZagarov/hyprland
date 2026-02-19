@@ -4,46 +4,46 @@
 -- OR add it to your main config file
 
 return {
-  'ggandor/leap.nvim',
-  config = function()
-    -- Basic keybindings (recommended by Leap)
-    -- 's' to leap forward/backward in current window
-    vim.keymap.set({'n', 'x', 'o'}, 's', '<Plug>(leap)')
+	url = "https://codeberg.org/andyg/leap.nvim",
+	config = function()
+		-- Basic keybindings (recommended by Leap)
+		-- 's' to leap forward/backward in current window
+		vim.keymap.set({ "n", "x", "o" }, "s", "<Plug>(leap)")
 
-    -- 'S' to leap across all visible windows
-    vim.keymap.set('n', 'S', '<Plug>(leap-from-window)')
+		-- 'S' to leap across all visible windows
+		vim.keymap.set("n", "S", "<Plug>(leap-from-window)")
 
-    -- RECOMMENDED TWEAKS for better experience
-    -- These reduce visual noise and make Leap feel smoother
+		-- RECOMMENDED TWEAKS for better experience
+		-- These reduce visual noise and make Leap feel smoother
 
-    -- 1. Preview filter: reduces blinking and visual noise
-    -- This prevents labels from showing up on whitespace and in the middle of words
-    -- You can still jump anywhere, but the preview is cleaner
-    require('leap').opts.preview = function (ch0, ch1, ch2)
-      return not (
-        ch1:match('%s')  -- Exclude whitespace
-        or (ch0:match('%a') and ch1:match('%a') and ch2:match('%a'))  -- Exclude middle of words
-      )
-    end
+		-- 1. Preview filter: reduces blinking and visual noise
+		-- This prevents labels from showing up on whitespace and in the middle of words
+		-- You can still jump anywhere, but the preview is cleaner
+		require("leap").opts.preview = function(ch0, ch1, ch2)
+			return not (
+				ch1:match("%s") -- Exclude whitespace
+				or (ch0:match("%a") and ch1:match("%a") and ch2:match("%a")) -- Exclude middle of words
+			)
+		end
 
-    -- 2. Equivalence classes: treat similar characters as the same
-    -- For example, searching for '(' will also match '[' and '{'
-    require('leap').opts.equivalence_classes = {
-      ' \t\r\n',    -- All whitespace is equivalent
-      '([{',        -- Opening brackets
-      ')]}',        -- Closing brackets
-      '\'"`'        -- Quotes
-    }
+		-- 2. Equivalence classes: treat similar characters as the same
+		-- For example, searching for '(' will also match '[' and '{'
+		require("leap").opts.equivalence_classes = {
+			" \t\r\n", -- All whitespace is equivalent
+			"([{", -- Opening brackets
+			")]}", -- Closing brackets
+			"'\"`", -- Quotes
+		}
 
-    -- 3. Repeat previous motion easily
-    -- Press Enter to repeat the last leap motion
-    -- Press Backspace to go backwards through matches
-    require('leap.user').set_repeat_keys('<enter>', '<backspace>')
+		-- 3. Repeat previous motion easily
+		-- Press Enter to repeat the last leap motion
+		-- Press Backspace to go backwards through matches
+		require("leap.user").set_repeat_keys("<enter>", "<backspace>")
 
-    -- OPTIONAL: Grey out the search area (makes target more visible)
-    -- Uncomment the line below if you want this effect:
-    -- vim.api.nvim_set_hl(0, 'LeapBackdrop', { link = 'Comment' })
-  end
+		-- OPTIONAL: Grey out the search area (makes target more visible)
+		-- Uncomment the line below if you want this effect:
+		-- vim.api.nvim_set_hl(0, 'LeapBackdrop', { link = 'Comment' })
+	end,
 }
 
 --[[
@@ -65,3 +65,4 @@ WHEN YOU'RE READY TO LEARN MORE:
 - Try using 's' in Visual mode to select text
 - Use 's' in Operator-pending mode (e.g., 'd' then 's') to delete until target
 ]]
+
